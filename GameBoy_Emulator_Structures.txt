@@ -25,7 +25,7 @@ Bus
  -> (maybe include 16 bit bus)
  -> uses memory management eg. // 0x0000 - 0x3FFF : ROM Bank 0
 				// 0x4000 - 0x7FFF : ROM Bank 1 - Switchable
-Cartridge
+Cartridge/ROM
  -> structure : filename, rom size, rom data, header, ram, rom, battery
  -> rom types e.g. Rom only, MBC1, etc.
  -> LIC Code (licence Codes)
