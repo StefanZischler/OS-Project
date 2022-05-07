@@ -16,6 +16,7 @@ CPU
 	-> set flags
 	-> read/process input from bus/registers
 	-> process different instructions e.g. cor, daa, ei, etc.
+	-> implement instructions
  ---> CPU Util
 	-> manage registers
 
@@ -25,6 +26,8 @@ Bus
  -> (maybe include 16 bit bus)
  -> uses memory management eg. // 0x0000 - 0x3FFF : ROM Bank 0
 				// 0x4000 - 0x7FFF : ROM Bank 1 - Switchable
+ -> bus calls different function depending with address it gets
+	 e.g. if (address < 0xE000) { return working_ram(address)}
 Cartridge/ROM
  -> structure : filename, rom size, rom data, header, ram, rom, battery
  -> rom types e.g. Rom only, MBC1, etc.
@@ -78,6 +81,17 @@ UI (User Interface)
  -> update window
  -> get key input
  -> handle events
+
+Video Tutorial:
+Part 1: loading project, reading/parsing cartridge/ROM
+Part 2: (bus.c/cpu.c/cpu.util/instructions.c) start bus, explanation how instruction work, setup instruction, 
+setup CPU files to parse/process instructions, start with some instruction implementation
+Part 3: (cpu_proc.c)process CPU instructions
+Part 4: (bus.c/cpu_proc.c/instructions.c) fetch_data from instructions, implement load/LD instructions
+Part 5: (ram.h/ram.c/bus.c) implement working and high RAM (wram/hram), upgrade bus
+Part 6: (instructions.c/cpu_proc.c/stack.h/stack.c) implement jump instruction (JP/JR/PUSH/POP/CALL/RET/RETI), implement Stack 
+Part 7: (cpu_proc.c/instructions.c) implement arithmetic instruction (INC/DEC/ADD/ADC/SUB/SBC)
+Part 8: (cpu_proc.c/instructions.c)  implement bit-wise/logic instructions (AND/XOR/OR/CP/SBC), implement special instruction set PREFIX position CB
 
 
 
