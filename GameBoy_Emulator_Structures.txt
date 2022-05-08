@@ -83,7 +83,7 @@ UI (User Interface)
  -> handle events
 
 Video Tutorial:
-Part 1: loading project, reading/parsing cartridge/ROM
+Part 1: (main.c/emu.h/emu.c/cart.h/cart.c/etc.)loading project, reading/parsing cartridge/ROM
 Part 2: (bus.c/cpu.c/cpu.util/instructions.c) start bus, explanation how instruction work, setup instruction, 
 setup CPU files to parse/process instructions, start with some instruction implementation
 Part 3: (cpu_proc.c)process CPU instructions
@@ -91,7 +91,14 @@ Part 4: (bus.c/cpu_proc.c/instructions.c) fetch_data from instructions, implemen
 Part 5: (ram.h/ram.c/bus.c) implement working and high RAM (wram/hram), upgrade bus
 Part 6: (instructions.c/cpu_proc.c/stack.h/stack.c) implement jump instruction (JP/JR/PUSH/POP/CALL/RET/RETI), implement Stack 
 Part 7: (cpu_proc.c/instructions.c) implement arithmetic instruction (INC/DEC/ADD/ADC/SUB/SBC)
-Part 8: (cpu_proc.c/instructions.c)  implement bit-wise/logic instructions (AND/XOR/OR/CP/SBC), implement special instruction set PREFIX position CB
-
-
-
+Part 8: (cpu_proc.c/instructions.c) implement bit-wise/logic instructions (AND/XOR/OR/CP/SBC), implement special instruction set PREFIX position CB
+Part 9: (cpu_proc.c/instructions.c/interrupts.h/interrupts.c/ui.h/ui.c) implement special instructions (), handle interrupts, 
+running CPU in its own thread, create screen window
+Part 10: (cpu_proc.c/instructions.c/io.h/io.c/emu.c/timer.c/timer.h) finish and bugfix instructions, include io proccessing for serial input from tests, (dbg.h/dbg.c only for tests/debugging),
+implement timer (for interrupts)
+Part 11: (ppu.c/ppu.h/dma.h/dma.c) implementing Pixel Proccesing Unit, works with OAM_RAM and VRAM, create debug window for tiles, Direct Memory Access(dma) for reading tiles from ROMs
+Part 12: (ppu.c/ppu.h/lcd.h/lcd.c/ppu_sm.h/ppu_sm.c) implement LCD (registers and modes), implement PPU State Machine (which mode the ppu is on (hblank, vblank, oam, xfer)
+Part 13: (ppu.c/ppu.h/ppu_pipeline.c) implement PPU pipeline (FIFO), render background
+Part 14: (ppu.c/ppu.h/ppu_sm.c/ppu_pipeline.c) add sprites (OAM_RAM) to PPU
+Part 15: (ppu.c/ppu.h/ppu_sm.c/ppu_pipeline.c/gamepad.h/gamepad.c/io.h/io.c/ui.c) add window, add gamepad
+Part 16: (cart.c/cart.h) add support for MBC1
