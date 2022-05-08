@@ -153,8 +153,8 @@ void ui_update() {
 void ui_on_key(bool down, u32 key_code) {
 
     switch(key_code) {
-        case SDLK_z: gamepad_get_state()->b = down; break;
-        case SDLK_x: gamepad_get_state()->a = down; break;
+        case SDLK_a: gamepad_get_state()->b = down; break;
+        case SDLK_s: gamepad_get_state()->a = down; break;
         case SDLK_RETURN: gamepad_get_state()->start = down; break;
         case SDLK_TAB: gamepad_get_state()->select = down; break;
         case SDLK_UP: gamepad_get_state()->up = down; break;
