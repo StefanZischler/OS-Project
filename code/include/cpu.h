@@ -1,6 +1,8 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <stdint.h>
+
 typedef struct {
   uint8_t a;
   uint8_t b;
@@ -12,11 +14,11 @@ typedef struct {
   uint8_t l;
   uint16_t sp;
   uint16_t pc;
-} cpu_registers
+} cpu_registers;
 
 typedef struct {
   cpu_registers registers;
-} cpu_context
+} cpu_context;
 
 #define CPU_FLAG_Z ((ctx & (1 << 7)) ? 1 : 0
 

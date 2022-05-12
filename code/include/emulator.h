@@ -1,6 +1,8 @@
 #ifndef EMU_H
 #define EMU_H
 
+#include <stdbool.h>
+
 typedef struct {
   bool paused;
   bool running;
