@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
+
 #include <emulator.h>
+#include <cpu.h>
 
 
 static emu_context ctx;
@@ -15,6 +17,8 @@ int emulator_run(int argc, char ** argv) {
     return -1;
   }
   //TODO: implement rom loading & run cycle
+  
+  cpu_init();
 
   return 0;
 }

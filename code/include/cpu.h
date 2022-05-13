@@ -20,7 +20,8 @@ typedef struct {
   cpu_registers registers;
 } cpu_context;
 
-#define CPU_FLAG_Z ((ctx & (1 << 7)) ? 1 : 0
+#define CPU_FLAG_Z ((ctx & (1 << 7)) >> 7
 
+void cpu_init();
 
 #endif
