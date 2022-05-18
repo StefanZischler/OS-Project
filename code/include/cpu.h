@@ -2,6 +2,7 @@
 #define CPU_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct {
   uint8_t a;
@@ -20,7 +21,10 @@ typedef struct {
   cpu_registers registers;
 } cpu_context;
 
-#define CPU_FLAG_Z ((ctx & (1 << 7)) >> 7
+bool cpu_flag_Z();
+bool cpu_flag_N();
+bool cpu_flag_H();
+bool cpu_flag_C();
 
 void cpu_init();
 
