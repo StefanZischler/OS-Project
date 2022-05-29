@@ -9,7 +9,7 @@ LIB = ../lib/
 all: gb_emulator
 
 gb_emulator: main.o emulator.o cpu.o bus.o rom.o
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)cpu.o $(LIB)bus.o $(LIB)rom.o
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)cpu.o $(LIB)bus.o $(LIB)rom.o
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
@@ -17,6 +17,8 @@ main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 emulator.o: $(INCL)cpu.h
 	gcc -o $(EMU)emulator.o -c $(EMU)emulator.c -I$(INCL)
 
+instruction_set.o: $(INCL)instruction_set.h $(INCL)cpu.h $(INCL)bus.h $(INCL)define.h
+	gcc -o $(PROC)instruction_set.o -c $(PROC)instruction_set.c -I$(INCL)	
 cpu.o: $(INCL)cpu.h
 	gcc -o $(PROC)cpu.o -c $(PROC)cpu.c -I$(INCL)
 
