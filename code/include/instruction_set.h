@@ -1,5 +1,5 @@
-#ifndef INSTRUCTION_SET.H
-#define INSTRUCTION_SET.H
+#ifndef INSTRUCTION_SET_H
+#define INSTRUCTION_SET_H
 
 #include <define.h>
 
@@ -17,17 +17,6 @@ register type: What register is being read/writtern from/to? e.g. reg A or reg A
 flag type: What flag type is being checked? eg. Flag Z or Flag CY
 memory address: In certain instruction e.g. 0xC7 the insructions include a jump to a specific memory address 
 */
-typedef struct {
-    instruction_type type;
-    addressing_components components;
-    register_type register_1;
-    register_type register_2;
-    flag_type flag;
-    u8 memory_address;
-} instruction_set;
-
-//get the opcode for the instruction
-instruction_set *get_instruction_opcode(u8 opcode);
 
 //define instruction types
 typedef enum {
@@ -152,4 +141,18 @@ typedef enum {
 typedef enum {
     FL_NONE, FL_C, FL_NC, FL_Z, FL_NZ
 } flag_type;
+
+typedef struct {
+    instruction_type type;
+    addressing_components components;
+    register_type register_1;
+    register_type register_2;
+    flag_type flag;
+    u8 memory_address;
+} instruction_set;
+
+
+//get the opcode for the instruction
+instruction_set *get_instruction_opcode(u8 opcode);
+
 #endif
