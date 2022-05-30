@@ -94,7 +94,7 @@ typedef enum {
     //save data from a register to a memory location specified by HL and increment contents of HL
     AC_HLI_R,
     //save data from a register to a memory location specified by HL and decrease contents of HL
-    AC_HLD_r,
+    AC_HLD_R,
     //load data of internal RAM, port register or mode register at address range 0xFF00-0xFFFF specified by 8-bit operand a8 to a register
     AC_R_A8,
     //save data of internal RAM, port register or mode register at address range 0xFF00-0xFFFF specified by 8-bit operand a8 to a register
