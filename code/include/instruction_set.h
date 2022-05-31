@@ -56,6 +56,7 @@ typedef enum {
     INS_EI,
     INS_LDH,
     INS_JPHL,
+    INS_CB,
     //CB instruction set
     INS_RLC,
     INS_RRC,
