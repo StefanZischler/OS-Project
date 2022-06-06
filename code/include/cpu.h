@@ -25,6 +25,9 @@ bool cpu_flag_N();
 bool cpu_flag_H();
 bool cpu_flag_C();
 
+void cpu_set_flags(bool z, bool n, bool h, bool c);
+void cpu_set_flag(bool n, int offset);
+
 void cpu_init();
 
 #endif

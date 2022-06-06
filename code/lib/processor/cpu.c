@@ -37,3 +37,42 @@ bool cpu_flag_H() {
 bool cpu_flag_C() {
   return (ctx.registers.f & (1 << 4)) >> 4;
 }
+
+void cpu_set_flags(bool z, bool n, bool h, bool c) {
+  /*if(z) {
+    //set flag to true
+    ctx.registers.f = ctx.registers.f | (1 << 7);
+  } else {
+    //set flag to false
+    ctx.registers.f = ctx.registers.f & ~(1 << 7);
+  }
+  if(n) {
+    ctx.registers.f = ctx.registers.f | (1 << 6);
+  } else {
+    ctx.registers.f = ctx.registers.f & ~(1 << 6);
+  }
+  if(h) {
+    ctx.registers.f = ctx.registers.f | (1 << 5);
+  } else {
+    ctx.registers.f = ctx.registers.f & ~(1 << 5);
+  }
+  if(c) {
+    ctx.registers.f = ctx.registers.f | (1 << 4);
+  } else {
+    ctx.registers.f = ctx.registers.f & ~(1 << 4);
+  }*/
+  cpu_set_flag(z, 7);
+  cpu_set_flag(n, 6);
+  cpu_set_flag(h, 5);
+  cpu_set_flag(c, 4);
+}
+
+void cpu_set_flag(bool n, int offset) {
+  if(n) {
+    //set flag to true
+    ctx.registers.f = ctx.registers.f | (1 << offset);
+  } else {
+    //set flag to false
+    ctx.registers.f = ctx.registers.f & ~(1 << offset);
+  }
+}
