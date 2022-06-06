@@ -1,20 +1,19 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <define.h>
 
 typedef struct {
-  uint8_t a;
-  uint8_t b;
-  uint8_t c;
-  uint8_t d;
-  uint8_t e;
-  uint8_t f;
-  uint8_t h;
-  uint8_t l;
-  uint16_t sp;
-  uint16_t pc;
+  u8 a;
+  u8 b;
+  u8 c;
+  u8 d;
+  u8 e;
+  u8 f;
+  u8 h;
+  u8 l;
+  u16 sp;
+  u16 pc;
 } cpu_registers;
 
 typedef struct {
