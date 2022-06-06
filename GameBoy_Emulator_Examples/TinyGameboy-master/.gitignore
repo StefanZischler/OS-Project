@@ -1,0 +1,9 @@
+.vscode
+.vs
+/Debug
+/Release
+/x64
+
+/ignore
+*.o
+gameboy

@@ -1,0 +1,15 @@
+OS-Project Meeting vom 6.6.2022:
+ 
+Theme:
+ - Begrüessig
+ - Was isch de momentani Stand? 
+ - Woran hend/sind mir am arbeite momentan?
+ - Was sind unseri nächsti Schritt? -> finish CPU (fetch/process instructions) + Stack + RAM-> Emulator cycles + timer -> Pixel Proccessing Unit + LCD -> gamepad + I/O  + interrupts -> UI
+ - Wie CPU implementieren? Alles in ein grosses File oder aufteilen?
+ - Wie wänn mir zämme arbeite? -> zämme im e Call oder allei und regüläri Meetings? -> eintel arbeiten mit regulären Meetings
+ - Wie gseht de Zitplan vo jedem bis zur Presentatin us? Stefan - Samstig Nommittag weg
+ - grobe Zitplan bis Presentation -> bis Freitag -> CPU and Memory
+ - Wenn mache mirs nächst Meeting? -> all 2 Täg am 14:00 
+
+Wer macht was? -> Sebastian: CPU_set_flags und emu_cycles (maybe Stack); Stefan: CPU_Processing/Fetch_data/Util 
+-> bis Mittwuch
