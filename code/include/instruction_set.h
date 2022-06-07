@@ -143,6 +143,7 @@ typedef enum {
     FL_NONE, FL_C, FL_NC, FL_Z, FL_NZ
 } flag_type;
 
+//define instruction_set structure
 typedef struct {
     instruction_type type;
     addressing_components components;

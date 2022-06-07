@@ -11,6 +11,8 @@ typedef struct {
 
 int emulator_run(int argc, char **argv);
 
+void emulator_cycles(int cpu_cycles_number);
+
 emu_context *emulator_get_context();
 
 #endif

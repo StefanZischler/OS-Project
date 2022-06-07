@@ -27,5 +27,13 @@ int emulator_run(int argc, char ** argv) {
 
   cpu_init();
 
+  if (!cpu_step()) {
+    printf("CPU stopped running!\n");
+    return -1;
+  }
   return 0;
+}
+
+void emulator_cycles(int cpu_cycles_number) {
+  //TODO: Implement cycles
 }

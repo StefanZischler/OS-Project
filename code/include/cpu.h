@@ -20,6 +20,10 @@ typedef struct {
 typedef struct {
   cpu_registers registers;
   instruction_set *current_instruction;
+  u8 current_opcode;
+  u16 fetched_data;
+  u16 memory_destination;
+  bool destination_is_in_memory;
 } cpu_context;
 
 bool cpu_flag_Z();
@@ -30,6 +34,16 @@ bool cpu_flag_C();
 void cpu_set_flags(bool z, bool n, bool h, bool c);
 void cpu_set_flag(bool n, int offset);
 
+typedef void (*INS_TYPE)(cpu_context *);
+
+INS_TYPE instruction_get_type(instruction_type type);
+
+void fetch_instruction();
+void fetch_instruction_data();
+
+u16 instruction_read_register(register_type register_type);
+
 void cpu_init();
+bool cpu_step();
 
 #endif
