@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <instruction_set.h>
 
 typedef struct {
   uint8_t a;
@@ -19,6 +20,7 @@ typedef struct {
 
 typedef struct {
   cpu_registers registers;
+  instruction_set *current_instruction;
 } cpu_context;
 
 bool cpu_flag_Z();
