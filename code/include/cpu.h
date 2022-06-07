@@ -2,6 +2,7 @@
 #define CPU_H
 
 #include <define.h>
+#include <instruction_set.h>
 
 typedef struct {
   u8 a;

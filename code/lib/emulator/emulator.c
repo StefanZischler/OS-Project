@@ -3,7 +3,7 @@
 
 #include <emulator.h>
 #include <cpu.h>
-
+#include <rom.h>
 
 static emu_context ctx;
 
@@ -17,7 +17,14 @@ int emulator_run(int argc, char ** argv) {
     return -1;
   }
   //TODO: implement rom loading & run cycle
+
+  if (!rom_load(argv[1])) {
+    printf("Failed to load the ROM file: %s\n", argv[1]);
+    return -1;
+  }
   
+  printf("Cart loaded correctly!\n");
+
   cpu_init();
 
   return 0;
