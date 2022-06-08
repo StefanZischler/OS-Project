@@ -167,7 +167,6 @@ void fetch_instruction_data() {
           return;
       //read 16-bit data (and save to a register)
       case AC_R_D16:
-          return;
       case AC_D16: {
           //can only read 8-bits at a time thats why split 16-bit into lower and higher 8-bits
           //read lower 8-bit from program counter
@@ -214,32 +213,44 @@ void fetch_instruction_data() {
           return;
 
       //TODO: rest of addressing components modes
-      case AC_R_MR:
-          return;
+      //read memory location specified by another register
+      case AC_R_MR:{
+        u16 address = instruction_read_register(ctx.current_instruction->register_2);
+        if (ctx.current_instruction->register_2 == REG_C) {
+          address |= 0xFF00;
+        }
+        ctx.fetched_data = bus_read(address);
+        emulator_cycles(1);
+      }  return;
+        
       case AC_R_HLI:
-          return;
+        return;
       case AC_R_HLD:
-          return; 
+        return; 
       case AC_HLI_R:
-          return;
+        return;
       case AC_HLD_R:
-          return;
+        return;
       case AC_R_A8:
-          return; 
+        return; 
       case AC_A8_R:
-          return;
+        return;
       case AC_HL_SPR:
-          return;
+        return;
+      //read d8 value
       case AC_D8:
-          return; 
+        ctx.fetched_data = bus_read(ctx.registers.pc);
+        emulator_cycles(1);
+        ctx.registers.pc++;
+        return; 
       case AC_MR_D8:
-          return;
+        return;
       case AC_MR:
-          return;
+        return;
       case AC_A16_R:
-          return; 
+        return; 
       case AC_R_A16:
-          return;     
+        return;     
       
       default:
           printf("Unknown Addressing Components! %d\n", ctx.current_instruction->components);
