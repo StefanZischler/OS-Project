@@ -32,7 +32,7 @@ int emulator_run(int argc, char ** argv) {
   ctx.ticks = 0;
 
   //start CPU
-  if (ctx.running) {
+  while (ctx.running) {
     if (ctx.paused) {
       sleep(10);
     }
@@ -40,7 +40,7 @@ int emulator_run(int argc, char ** argv) {
     printf("CPU stopped running!\n");
     return -1;
     }
-    ctx.ticks++;
+    //ctx.ticks++;
   }
   
   return 0;
