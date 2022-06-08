@@ -8,8 +8,8 @@ LIB = ../lib/
 
 all: gb_emulator
 
-gb_emulator: main.o emulator.o instruction_set.o cpu.o bus.o rom.o timer.o 
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)cpu.o $(LIB)bus.o $(LIB)rom.o $(LIB)timer.o
+gb_emulator: main.o emulator.o instruction_set.o cpu.o bus.o rom.o stack.o timer.o 
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)cpu.o $(LIB)bus.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
@@ -28,6 +28,9 @@ bus.o: $(INCL)bus.h $(INCL)define.h
 
 rom.o: $(INCL)rom.h $(INCL)define.h
 	gcc -o $(LIB)rom.o -c $(LIB)rom.c -I$(INCL)
+	
+stack.o: $(INCL)stack.h $(INCL)define.h $(INCL)cpu.h $(INCL)bus.h
+	gcc -o $(LIB)stack.o -c $(LIB)stack.c -I$(INCL)
 
 timer.o: $(INCL)timer.h $(INCL)interrupts.h $(INCL)define.h
 	gcc -o $(LIB)timer.o -c $(LIB)timer.c -I$(INCL)
