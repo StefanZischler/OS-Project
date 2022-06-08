@@ -18,12 +18,23 @@ typedef struct {
 } cpu_registers;
 
 typedef struct {
+
   cpu_registers registers;
+
+  //current fetch data for instruction
   instruction_set *current_instruction;
   u8 current_opcode;
   u16 fetched_data;
   u16 memory_destination;
   bool destination_is_in_memory;
+
+  //CPU information
+  bool halted;
+  bool stepping;
+
+  //interrupt master flag
+  bool interrupt_master_enabled_flag;  
+
 } cpu_context;
 
 bool cpu_flag_Z();

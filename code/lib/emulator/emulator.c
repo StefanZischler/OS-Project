@@ -17,7 +17,6 @@ int emulator_run(int argc, char ** argv) {
     printf("Usage: emulator <rom_file>\n");
     return -1;
   }
-  //TODO: implement rom loading & run cycle
 
   if (!rom_load(argv[1])) {
     printf("Failed to load the ROM file: %s\n", argv[1]);
@@ -26,12 +25,24 @@ int emulator_run(int argc, char ** argv) {
   
   printf("Cart loaded correctly!\n");
 
+  //initialize CPU
   cpu_init();
+  ctx.running = true;
+  ctx.paused = false;
+  ctx.ticks = 0;
 
-  if (!cpu_step()) {
+  //start CPU
+  if (ctx.running) {
+    if (ctx.paused) {
+      sleep(10);
+    }
+    if (!cpu_step()) {
     printf("CPU stopped running!\n");
     return -1;
+    }
+    ctx.ticks++;
   }
+  
   return 0;
 }
 
