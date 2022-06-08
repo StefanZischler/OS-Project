@@ -4,6 +4,7 @@
 #include <emulator.h>
 #include <cpu.h>
 #include <rom.h>
+#include <timer.h>
 
 static emu_context ctx;
 
@@ -35,5 +36,13 @@ int emulator_run(int argc, char ** argv) {
 }
 
 void emulator_cycles(int cpu_cycles_number) {
-  //TODO: Implement cycles
+  for(int i=0; i<cpu_cycles_number; i++) {
+    //1 cpu cycle == 4 ticks
+    for(int j=0; j<4; j++) {
+      ctx.ticks++;
+      timer_tick();
+      //TODO: ppu
+    }
+    //TODO: dma
+  }
 }

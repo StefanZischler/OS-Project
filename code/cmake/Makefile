@@ -8,13 +8,13 @@ LIB = ../lib/
 
 all: gb_emulator
 
-gb_emulator: main.o emulator.o instruction_set.o cpu.o bus.o rom.o
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)cpu.o $(LIB)bus.o $(LIB)rom.o
+gb_emulator: main.o emulator.o instruction_set.o cpu.o bus.o rom.o timer.o
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)cpu.o $(LIB)bus.o $(LIB)rom.o $(LIB)timer.o
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
 
-emulator.o: $(INCL)cpu.h $(INCL)rom.h $(INCL)emulator.h
+emulator.o: $(INCL)cpu.h $(INCL)rom.h $(INCL)emulator.h $(INCL)timer.h
 	gcc -o $(EMU)emulator.o -c $(EMU)emulator.c -I$(INCL)
 
 instruction_handling.o: $(INCL)emulator.h $(INCL)cpu.h $(INCL)bus.h
@@ -30,4 +30,6 @@ bus.o: $(INCL)bus.h $(INCL)define.h
 	gcc -o $(LIB)bus.o -c $(LIB)bus.c -I$(INCL)
 
 rom.o: $(INCL)rom.h $(INCL)define.h
-	gcc -o $(LIB)rom.o -c $(LIB)rom.c -I$(INCL)	
+	gcc -o $(LIB)rom.o -c $(LIB)rom.c -I$(INCL)
+timer.o: $(INCL)timer.h $(INCL)define.h
+	gcc -o $(LIB)timer.o -c $(LIB)timer.c -I$(INCL)

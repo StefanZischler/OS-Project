@@ -7,6 +7,7 @@ typedef struct {
   bool paused;
   bool running;
   bool exit;
+  int ticks;
 } emu_context;
 
 int emulator_run(int argc, char **argv);

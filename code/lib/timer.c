@@ -1,6 +1,6 @@
 #include <timer.h>
 
-timer_context ctx = {0};
+static timer_context ctx = {0};
 
 void timer_init() {
   
