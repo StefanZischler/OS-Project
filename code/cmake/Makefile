@@ -20,7 +20,7 @@ emulator.o: $(INCL)cpu.h $(INCL)rom.h $(INCL)emulator.h $(INCL)timer.h
 instruction_set.o: $(INCL)instruction_set.h $(INCL)cpu.h $(INCL)bus.h $(INCL)define.h
 	gcc -o $(PROC)instruction_set.o -c $(PROC)instruction_set.c -I$(INCL)	
 
-cpu.o: $(INCL)cpu.h $(INCL)emulator.h $(INCL)instruction_set.h $(INCL)bus.h 
+cpu.o: $(INCL)cpu.h $(INCL)emulator.h $(INCL)interrupts.h $(INCL)instruction_set.h $(INCL)bus.h 
 	gcc -o $(PROC)cpu.o -c $(PROC)cpu.c -I$(INCL)
 
 bus.o: $(INCL)bus.h $(INCL)define.h
@@ -29,5 +29,5 @@ bus.o: $(INCL)bus.h $(INCL)define.h
 rom.o: $(INCL)rom.h $(INCL)define.h
 	gcc -o $(LIB)rom.o -c $(LIB)rom.c -I$(INCL)
 
-timer.o: $(INCL)timer.h $(INCL)define.h
+timer.o: $(INCL)timer.h $(INCL)interrupts.h $(INCL)define.h
 	gcc -o $(LIB)timer.o -c $(LIB)timer.c -I$(INCL)

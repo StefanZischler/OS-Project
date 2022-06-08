@@ -24,6 +24,10 @@ typedef struct {
   u16 fetched_data;
   u16 memory_destination;
   bool destination_is_in_memory;
+  
+  //interrupts
+  bool ime;
+  u8 interrupt_flag;
 } cpu_context;
 
 bool cpu_flag_Z();

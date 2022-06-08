@@ -3,6 +3,7 @@
 
 #include <cpu.h>
 #include <instruction_set.h>
+#include <interrupts.h>
 #include <emulator.h>
 #include <bus.h>
 
@@ -479,3 +480,8 @@ bool cpu_step () {
   return true;
 }
 
+
+//requests an interrupt by setting the corresponding interrupt flag
+void cpu_request_interrupt(interrupt_type type) {
+  ctx.interrupt_flag = ctx.interrupt_flag | type;
+}
