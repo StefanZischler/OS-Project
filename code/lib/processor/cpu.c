@@ -140,6 +140,32 @@ u16 instruction_read_register(register_type register_type) {
     }
 }
 
+//set value into register given by instruction
+u16 instruction_set_register(register_type register_type, u16 value) {
+    switch(register_type) {
+        //8-bit registers
+        case REG_A: ctx.registers.a = value & 0xFF; break;
+        case REG_B: ctx.registers.b = value & 0xFF; break;
+        case REG_C: ctx.registers.c = value & 0xFF; break;
+        case REG_D: ctx.registers.d = value & 0xFF; break;
+        case REG_E: ctx.registers.e = value & 0xFF; break;
+        case REG_H: ctx.registers.h = value & 0xFF; break;
+        case REG_L: ctx.registers.l = value & 0xFF; break;
+        
+        //16-bit registers
+        case REG_AF: *((u16 *)&ctx.registers.a) = reverse_bits(value);break;
+        case REG_BC: *((u16 *)&ctx.registers.b) = reverse_bits(value);break;
+        case REG_DE: *((u16 *)&ctx.registers.d) = reverse_bits(value);break;
+        case REG_HL: *((u16 *)&ctx.registers.h) = reverse_bits(value);break;
+        //stack pointer
+        case REG_SP: ctx.registers.sp = value & 0xFF; break;
+        //program counter
+        case REG_PC: ctx.registers.pc = value & 0xFF; break;
+        //default
+        default: break;
+    }
+}
+
 /* 
 FETCHING
 */
@@ -212,7 +238,6 @@ void fetch_instruction_data() {
           ctx.registers.pc++;
           return;
 
-      //TODO: rest of addressing components modes
       //read memory location specified by another register
       case AC_R_MR:{
         u16 address = instruction_read_register(ctx.current_instruction->register_2);
@@ -222,36 +247,125 @@ void fetch_instruction_data() {
         ctx.fetched_data = bus_read(address);
         emulator_cycles(1);
       }  return;
-        
+
+      //read the data from memory specified by register HL and set it in another  register. 
+      //simultaniously incriment HL
       case AC_R_HLI:
-        return;
+        ctx.fetched_data = bus_read(instruction_read_register(ctx.current_instruction->register_2));
+        emulator_cycles(1);
+        instruction_set_register(REG_HL, instruction_read_register(REG_HL) +1);
+        return; 
+
+       //read the data from memory specified by register HL and set it in another  register. 
+      //simultaniously decrement HL
       case AC_R_HLD:
+        ctx.fetched_data = bus_read(instruction_read_register(ctx.current_instruction->register_2));
+        emulator_cycles(1);
+        instruction_set_register(REG_HL, instruction_read_register(REG_HL) -1);
         return; 
+
+      //read amd store the data from a register to a memory location specified by register HL. 
+      //simultaniously incriment HL
       case AC_HLI_R:
-        return;
-      case AC_HLD_R:
-        return;
-      case AC_R_A8:
+        ctx.fetched_data = bus_read(instruction_read_register(ctx.current_instruction->register_2));
+        ctx.memory_destination = instruction_read_register(ctx.current_instruction->register_1);
+        ctx.destination_is_in_memory = true;
+        instruction_set_register(REG_HL, instruction_read_register(REG_HL) +1);
         return; 
+
+      //read amd store the data from a register to a memory location specified by register HL. 
+      //simultaniously decrement HL
+      case AC_HLD_R:
+        ctx.fetched_data = bus_read(instruction_read_register(ctx.current_instruction->register_2));
+        ctx.memory_destination = instruction_read_register(ctx.current_instruction->register_1);
+        ctx.destination_is_in_memory = true;
+        instruction_set_register(REG_HL, instruction_read_register(REG_HL) -1);
+        return; 
+
+      //load contents from internal RAM (0xFF00-0xFFFF) into register A
+      case AC_R_A8:
+        ctx.fetched_data = bus_read(ctx.registers.pc);
+        emulator_cycles(1);
+        ctx.registers.pc++;
+        return; 
+
+      //store contents of register A into internal RAM (0xFF00-0xFFFF)
       case AC_A8_R:
-        return;
+        ctx.fetched_data = bus_read(ctx.registers.pc) | 0xFF00;
+        ctx.destination_is_in_memory = true;
+        emulator_cycles(1);
+        ctx.registers.pc++;
+        return; 
+
+      //read and add contents of SP to HL
       case AC_HL_SPR:
-        return;
+        ctx.fetched_data = bus_read(ctx.registers.pc);
+        emulator_cycles(1);
+        ctx.registers.pc++;
+        return; 
+
       //read d8 value
       case AC_D8:
         ctx.fetched_data = bus_read(ctx.registers.pc);
         emulator_cycles(1);
         ctx.registers.pc++;
         return; 
+
+      //save data from 8-bit operand d8 to a memory location specified by HL
       case AC_MR_D8:
-        return;
-      case AC_MR:
-        return;
-      case AC_A16_R:
+        ctx.fetched_data = bus_read(ctx.registers.pc);
+        emulator_cycles(1);
+        ctx.registers.pc++;
+        ctx.memory_destination = instruction_read_register(ctx.current_instruction->register_1);
+        ctx.destination_is_in_memory = true;
         return; 
-      case AC_R_A16:
-        return;     
+        
+       //read from memory register HL 
+      case AC_MR:
+        ctx.memory_destination = instruction_read_register(ctx.current_instruction->register_1);
+        ctx.destination_is_in_memory = true;
+        ctx.fetched_data = bus_read(instruction_read_register(ctx.current_instruction->register_1));
+        emulator_cycles(1);
+        return;
+
+      //save or write from/to a 16-bit address from a register  
+      case AC_A16_R:
+      case AC_D16_R: {
+        //can only read 8-bits at a time thats why split 16-bit into lower and higher 8-bits
+        //read lower 8-bit from program counter
+        u16 low = bus_read(ctx.registers.pc);
+        emulator_cycles(1);
+
+        //read higher 8-bit from program counter
+        u16 high = bus_read(ctx.registers.pc + 1);
+        emulator_cycles(1);
+
+        //fetch the combined data from lower and higher bit into memory destination
+        ctx.memory_destination = low | (high << 8);
+        ctx.destination_is_in_memory = true;
+        //increase the program counter by 2
+        ctx.registers.pc += 2;
+        ctx.fetched_data = instruction_read_register(ctx.current_instruction->register_2);
+      } return;
       
+      //read 16-bit address to load to program counter or start at address
+      case AC_R_A16: {
+        //read lower 8-bit from program counter
+        u16 low = bus_read(ctx.registers.pc);
+        emulator_cycles(1);
+
+        //read higher 8-bit from program counter
+        u16 high = bus_read(ctx.registers.pc + 1);
+        emulator_cycles(1);
+
+        //fetch the combined data from lower and higher bit
+        u16 address = low | (high << 8);
+        //increase the program counter by 2
+        ctx.registers.pc += 2;
+        ctx.fetched_data = bus_read(address);
+        emulator_cycles(1);
+      } return;  
+    
       default:
           printf("Unknown Addressing Components! %d\n", ctx.current_instruction->components);
           exit(-3);

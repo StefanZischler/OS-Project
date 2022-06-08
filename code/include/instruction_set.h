@@ -106,6 +106,8 @@ typedef enum {
     AC_D8,
     //work with a 16-bit value; used to set flags
     AC_D16,
+    //work with a 16-bit value; used to set flags
+    AC_D16_R,
     //save data from 8-bit operand d8 to a memory location specified by HL 
     AC_MR_D8,
     //make operations on memory register HL
