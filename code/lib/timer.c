@@ -1,4 +1,5 @@
 #include <timer.h>
+#include <interrupts.h>
 
 static timer_context ctx = {0};
 
@@ -41,7 +42,7 @@ void timer_tick() {
       //reset TIMA
       ctx.tima = ctx.tma;
       
-      //TODO: interrupt request
+      cpu_request_interrupt(INTERRUPT_TIMER);
     }
   }
 }

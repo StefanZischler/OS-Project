@@ -35,6 +35,10 @@ typedef struct {
   //interrupt master flag
   bool interrupt_master_enabled_flag;  
 
+  
+  //interrupts
+  bool ime;
+  u8 interrupt_flag;
 } cpu_context;
 
 bool cpu_flag_Z();
