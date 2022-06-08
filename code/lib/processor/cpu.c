@@ -81,6 +81,24 @@ void cpu_set_flag(bool n, int offset) {
   }
 }
 
+//helper function to look up if Z/C Flags are set
+static bool check_flag(cpu_context *ctx){
+  bool z_flag = cpu_flag_Z;
+  bool c_flag = cpu_flag_C;
+
+  switch(ctx->current_instruction->flag) {
+    case FL_NONE: return true;
+    case FL_C: return c_flag;
+    case FL_NC: return !c_flag;
+    case FL_Z: return z_flag;
+    case FL_NZ: return !z_flag;
+  }
+
+  return false;
+}
+
+
+
 //execute the current instruction -> for that get the instruction type
 static void execute() {
   printf("Executing instruction: %02X  PC: %04X\n", ctx.current_opcode, ctx.registers.pc);
@@ -100,118 +118,127 @@ static void execute() {
 everything under here till cpu_step() should be in instruction_handling.c
 for testing temporarily put here
 */
+
 void fetch_instruction_data () {
     ctx.current_opcode = bus_read(ctx.registers.pc++);
     ctx.current_instruction = get_instruction_opcode(ctx.current_opcode);
 };
 
 static void type_none(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Not a real instruction...\n");
+  exit(-2);
 }
 static void type_nop(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  //This function should do nothing
+  printf("NOP Instruction\n");
 }
 static void type_ld(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_inc(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_dec(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_rlc(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_add(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_rrc(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_stop(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  fprintf(stderr, "Stopping CPU!\n");
 }
 static void type_rla(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_jr(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_rra(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_daa(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_cpl(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_scf(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_ccf(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_halt(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_adc(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_sub(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_sbc(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_and(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_xor(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("XOR Instruction\n");
+  ctx->registers.a ^= ctx->fetched_data & 0xFF;
+  cpu_set_flags(ctx->registers.a == 0,0,0,0);
 }
 static void type_or(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_cp(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_ret(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_pop(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_jp(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Jump Instruction\n");
+  if(check_flag(ctx)) {
+    ctx->registers.pc = ctx->fetched_data;
+    emulator_cycles(1);
+  }
 }
 static void type_call(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_push(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_rst(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_reti(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_di(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_ei(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_ldh(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_jphl(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 static void type_cb(cpu_context *ctx) {
-  printf("Instruction %2X not implemented yet...\n", ctx->current_opcode);
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 
 // helper function to map instruction type from instruction set to a responding function 
@@ -290,6 +317,8 @@ u16 instruction_read_register(register_type register_type) {
         default: return 0;
     }
 }
+
+
 // read opcode from bus and get instruction from instruction_set
 void fetch_instruction() {
     ctx.memory_destination = 0;
@@ -343,7 +372,8 @@ void fetch_instruction() {
     //save contents of a register in internal RAM or register specified by a16
     AC_A16_R,
     //depending on which flag is set load a16 into the program counter or follow the subsequent instruction starting a address a16
-    AC_R_A16*/
+    AC_R_A16
+    */
     //No instruction
     case AC_NONE:
         return;
@@ -428,12 +458,14 @@ void fetch_instruction() {
     }
 };
 
+
 /*basic cpu step
  1. get instruction
  2. get data from registers/bus
  3. execute instruction
 */
 bool cpu_step () {
+  
   u16 pc = ctx.registers.pc;
   fetch_instruction();
   emulator_cycles(1);

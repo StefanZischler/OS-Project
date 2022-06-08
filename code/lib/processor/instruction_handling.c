@@ -1,6 +1,7 @@
 #include <cpu.h>
 #include <bus.h>
 #include <emulator.h>
+#include <instruction_handling.h>
 
 cpu_context ctx = {0};
 
@@ -14,9 +15,25 @@ useful functions to help deal with functions.
 functions that help deal with instructions 
 */
 
+//helper function to look up if Z/C Flags are set
+static bool check_flag(cpu_context *ctx){
+  bool z_flag = cpu_flag_Z;
+  bool c_flag = cpu_flag_C;
+
+  switch(ctx->current_instruction->flag) {
+    case FL_NONE: return true;
+    case FL_C: return c_flag;
+    case FL_NC: return !c_flag;
+    case FL_Z: return z_flag;
+    case FL_NZ: return !z_flag;
+  }
+
+  return false;
+}
+
 //reverse the input bits (register data) -> needed for the 16-bit registers
 u16 reverse_bits(u16 bits) {
-    return ((bits & 0xFF00) >> 8) \ ((bits = ox00FF) << 8);
+    return ((bits & 0xFF00) >> 8) | ((bits = 0x00FF) << 8);
 }
 
 //read from register defined by instruction
@@ -32,10 +49,10 @@ u16 instruction_read_register(register_type register_type) {
         case REG_L: return ctx.registers.l;
         
         //16-bit registers
-        case REG_AF: return reverse(*((u16 *)&ctx.registers.a));
-        case REG_BC: return reverse(*((u16 *)&ctx.registers.b));
-        case REG_DE: return reverse(*((u16 *)&ctx.registers.d));
-        case REG_HL: return reverse(*((u16 *)&ctx.registers.h));
+        case REG_AF: return reverse_bits(*((u16 *)&ctx.registers.a));
+        case REG_BC: return reverse_bits(*((u16 *)&ctx.registers.b));
+        case REG_DE: return reverse_bits(*((u16 *)&ctx.registers.d));
+        case REG_HL: return reverse_bits(*((u16 *)&ctx.registers.h));
         //stack pointer
         case REG_SP: return ctx.registers.sp;
         //program counter
@@ -60,6 +77,171 @@ void fetch_instruction_data () {
     ctx.current_instruction = get_instruction_opcode(ctx.current_opcode);
 };
 
+static void type_none(cpu_context *ctx) {
+  printf("Not a real instruction...\n");
+  exit(-2);
+}
+static void type_nop(cpu_context *ctx) {
+  //This function should do nothing
+  printf("NOP Instruction\n");
+}
+static void type_ld(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_inc(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_dec(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_rlc(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_add(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_rrc(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_stop(cpu_context *ctx) {
+  fprintf(stderr, "Stopping CPU!\n");
+}
+static void type_rla(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_jr(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_rra(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_daa(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_cpl(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_scf(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_ccf(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_halt(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_adc(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_sub(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_sbc(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_and(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_xor(cpu_context *ctx) {
+  printf("XOR Instruction\n");
+  ctx->registers.a ^= ctx->fetched_data & 0xFF;
+  cpu_set_flags(ctx->registers.a == 0,0,0,0);
+}
+static void type_or(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_cp(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_ret(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_pop(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_jp(cpu_context *ctx) {
+  printf("Jump Instruction\n");
+  if(check_flag(ctx)) {
+    ctx->registers.pc = ctx->fetched_data;
+    emulator_cycles(1);
+  }
+}
+static void type_call(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_push(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_rst(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_reti(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_di(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_ei(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_ldh(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_jphl(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+static void type_cb(cpu_context *ctx) {
+  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+}
+
+// helper function to map instruction type from instruction set to a responding function 
+static INS_TYPE type[] = {
+    [INS_NONE] = type_none,
+    [INS_NOP] = type_nop,
+    [INS_LD]  = type_ld,
+    [INS_INC] = type_inc,
+    [INS_DEC] = type_dec,
+    [INS_RLC] = type_rlc,
+    [INS_ADD] = type_add,
+    [INS_RRC] = type_rrc,
+    [INS_STOP]= type_stop,
+    [INS_RLA] = type_rla,
+    [INS_JR]  = type_jr,
+    [INS_RRA] = type_rra,
+    [INS_DAA] = type_daa,
+    [INS_CPL] = type_cpl,
+    [INS_SCF] = type_scf,
+    [INS_CCF] = type_ccf,
+    [INS_HALT] = type_halt,
+    [INS_ADC] = type_adc,
+    [INS_SUB] = type_sub,
+    [INS_SBC] = type_sbc,
+    [INS_AND] = type_and,
+    [INS_XOR] = type_xor,
+    [INS_OR]  = type_or,
+    [INS_CP]  = type_cp,
+    [INS_RET] = type_ret,
+    [INS_POP] = type_pop,
+    [INS_JP]  = type_jp,
+    [INS_CALL] = type_call,
+    [INS_PUSH] = type_push,
+    [INS_RST] = type_rst,
+    [INS_RETI] = type_reti,
+    [INS_DI]  = type_di,
+    [INS_EI]  = type_ei,
+    [INS_LDH] = type_ldh,
+    [INS_JPHL] = type_jphl,
+    [INS_CB]  = type_cb
+};
+
+
+// get instruction type from helper function
+INS_TYPE instruction_get_type(instruction_type ins_type) {
+    return type[ins_type];
+}
+
+
+
 // read opcode from bus and get instruction from instruction_set
 void fetch_instruction() {
     ctx.memory_destination = 0;
@@ -68,11 +250,12 @@ void fetch_instruction() {
     // test if there is current istruction
     // return 0 if not
     if(ctx.current_instruction == NULL) {
-        return 0;
+        return;
     }
 
     //switch between all addressing component cases
     switch (ctx.current_instruction->components) {
+   /*
     AC_NONE,
     //registers involved 
     //save 16-bit data to register
@@ -112,7 +295,7 @@ void fetch_instruction() {
     //save contents of a register in internal RAM or register specified by a16
     AC_A16_R,
     //depending on which flag is set load a16 into the program counter or follow the subsequent instruction starting a address a16
-    AC_R_A16
+    AC_R_A16*/
     //No instruction
     case AC_NONE:
         return;
@@ -129,7 +312,7 @@ void fetch_instruction() {
         emulator_cycles(1);
 
         //fetch the combined data from lower and higher bit
-        ctx.fetched_data = lo | (hi << 8);
+        ctx.fetched_data = low | (high << 8);
         //increase the program counter by 2
         ctx.registers.pc += 2;
         
@@ -192,58 +375,7 @@ void fetch_instruction() {
         return;     
     
     default:
-        print("Unknown Addressing Components! %d\n", ctx.current_instruction->components);
+        printf("Unknown Addressing Components! %d\n", ctx.current_instruction->components);
         return;
     }
 };
-
-
-
-/*
-functions that process instructions
-*/
-
-// helper function to map instruction type from instruction set to a responding function 
-static INS_TYPE type[] = {
-    [INS_NONE] = type_none,
-    [INS_NOP] = type_nop,
-    [INS_LD]  = type_ld,
-    [INS_INC] = type_inc,
-    [INS_DEC] = type_dec,
-    [INS_RLC] = type_rlc,
-    [INS_ADD] = type_add,
-    [INS_RRC] = type_rrc,
-    [INS_STOP]= type_stop,
-    [INS_RLA] = type_rla,
-    [INS_JR]  = type_jr,
-    [INS_RRA] = type_rra,
-    [INS_DAA] = type_daa,
-    [INS_CPL] = type_cpl,
-    [INS_SCF] = type_scf,
-    [INS_CCF] = type_ccf,
-    [INS_HALT] = type_halt,
-    [INS_ADC] = type_adc,
-    [INS_SUB] = type_sub,
-    [INS_SBC] = type_sbc,
-    [INS_AND] = type_and,
-    [INS_XOR] = type_xor,
-    [INS_OR]  = type_or,
-    [INS_CP]  = type_cp,
-    [INS_RET] = type_ret,
-    [INS_POP] = type_pop,
-    [INS_JP]  = type_jp,
-    [INS_CALL] = type_call,
-    [INS_PUSH] = type_push,
-    [INS_RST] = type_rst,
-    [INS_RETI] = type_reti,
-    [INS_DI]  = type_di,
-    [INS_EI]  = type_ei,
-    [INS_LDH] = type_ldh,
-    [INS_JPHL] = type_jphl,
-    [INS_CB]  = type_cb
-};
-
-// get instruction type from helper function
-INS_TYPE instruction_get_type(ins_type type) {
-    return type[type];
-}

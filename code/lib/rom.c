@@ -14,8 +14,8 @@ static rom_context r_ctx;
 
 //Licence Codes from the different publishers, taken from: https://gbdev.io/pandocs/The_Cartridge_Header.html
 static const char *LICENCE_CODE[0xA5] = {
-    [0x00] = "None",
-    [0x01] = "Nintendo R&D1",
+    [0x00] =    "None",
+    [0x01] =    "Nintendo R&D1",
     [0x08] =    "Capcom",
     [0x13] =    "Electronic Arts",
     [0x18] =    "Hudson Soft",

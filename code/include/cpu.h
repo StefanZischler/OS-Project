@@ -34,6 +34,9 @@ bool cpu_flag_C();
 void cpu_set_flags(bool z, bool n, bool h, bool c);
 void cpu_set_flag(bool n, int offset);
 
+void cpu_init();
+bool cpu_step();
+
 typedef void (*INS_TYPE)(cpu_context *);
 
 INS_TYPE instruction_get_type(instruction_type type);
@@ -43,7 +46,5 @@ void fetch_instruction_data();
 
 u16 instruction_read_register(register_type register_type);
 
-void cpu_init();
-bool cpu_step();
 
 #endif
