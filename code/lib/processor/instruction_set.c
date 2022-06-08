@@ -239,7 +239,7 @@ instruction_set instructions[0x100] = {
     [0xCF] = {INS_RST, AC_NONE, REG_NONE, REG_NONE, FL_NONE, 0x08},
 
     //0xDX - forteenth row
-    [0xD0] = {INS_RET, AC_NONE,  REG_NONE, REG_NONE, FL_Nc},
+    [0xD0] = {INS_RET, AC_NONE,  REG_NONE, REG_NONE, FL_NC},
     [0xD1] = {INS_POP, AC_R,  REG_DE},
     [0xD2] = {INS_JP, AC_D16,  REG_NONE, REG_NONE, FL_NC},
     [0xD3] = {INS_NONE},
