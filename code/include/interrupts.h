@@ -3,6 +3,7 @@
 
 #include <cpu.h>
 
+//types work as bitmask for interrupt flags/enable registers
 typedef enum {
   INTERRUPT_VBLANK = 1,
   INTERRUPT_LCD_STAT = 2,

@@ -8,8 +8,8 @@ LIB = ../lib/
 
 all: gb_emulator
 
-gb_emulator: main.o emulator.o instruction_set.o cpu.o bus.o ram.o rom.o stack.o timer.o 
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)cpu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
+gb_emulator: main.o emulator.o instruction_set.o interrupts.o cpu.o bus.o ram.o rom.o stack.o timer.o
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(PROC)cpu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
@@ -19,6 +19,9 @@ emulator.o: $(INCL)cpu.h $(INCL)rom.h $(INCL)emulator.h $(INCL)timer.h
 
 instruction_set.o: $(INCL)instruction_set.h $(INCL)cpu.h $(INCL)bus.h $(INCL)define.h
 	gcc -o $(PROC)instruction_set.o -c $(PROC)instruction_set.c -I$(INCL)	
+
+interrupts.o: $(INCL)interrupts.h $(INCL)cpu.h $(INCL)stack.h
+	gcc -o $(PROC)interrupts.o -c $(PROC)interrupts.c -I$(INCL)
 
 cpu.o: $(INCL)cpu.h $(INCL)emulator.h $(INCL)interrupts.h $(INCL)instruction_set.h $(INCL)bus.h 
 	gcc -o $(PROC)cpu.o -c $(PROC)cpu.c -I$(INCL)
