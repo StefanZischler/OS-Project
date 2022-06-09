@@ -540,7 +540,7 @@ static void type_dec(cpu_context *ctx) {
   //if 16-bit register involved needs an extra emulator cycle
   if (ctx->current_instruction->register_2 >= REG_BC) {
       emulator_cycles(1);
-    }
+  }
   
   //special case with memory register HL
   if (ctx->current_instruction->register_1 == REG_HL && ctx->current_instruction->components == AC_MR) {
@@ -575,8 +575,42 @@ static void type_rlca(cpu_context *ctx) {
    // set CY flag to bit value, all other to 0
    cpu_set_flags(0, 0,  0, value);
 }
+
+//add the contents of 8-bit operand d8 or from a register, into register A and update flags
 static void type_add(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("ADD Instruction\n");
+  //read data from register A and other register
+  u32 data = instruction_read_register(ctx->current_instruction->register_1) + ctx->fetched_data;
+  
+  //define flag variables (for 8-bit instructions)
+  bool z_flag = (data & 0xFF) == 0;
+  bool n_flag = 0;
+  bool h_flag = (instruction_read_register(ctx->current_instruction->register_1) & 0xF) + (ctx->fetched_data & 0xF) >= 0x10;
+  bool c_flag = (int)(instruction_read_register(ctx->current_instruction->register_1) & 0xFF) + (int)(ctx->fetched_data & 0xFF) >= 0x100;
+  
+  //if 16-bit register involved needs an extra emulator cycle
+  //get right flags for z,n,h,c
+  if (ctx->current_instruction->register_2 >= REG_BC) {
+    emulator_cycles(1);
+    z_flag = -1;
+    h_flag = (instruction_read_register(ctx->current_instruction->register_1) & 0xFFF) + (ctx->fetched_data & 0xFFF) >= 0x1000;
+    c_flag = ((u32)instruction_read_register(ctx->current_instruction->register_1)) + ((u32)ctx->fetched_data) >= 0x10000;
+  }
+  
+  //special case with SP register, loads a 8-bit s8 operand
+  //get right flags for this case
+  if (ctx->current_instruction->register_1 == REG_SP) {
+    data = instruction_read_register(ctx->current_instruction->register_1) + (int8_t)ctx->fetched_data;
+    z_flag = 0;
+    h_flag = (instruction_read_register(ctx->current_instruction->register_1) & 0xF) + (ctx->fetched_data & 0xF) >= 0x10;
+    c_flag = (int)(instruction_read_register(ctx->current_instruction->register_1) & 0xFF) + (int)(ctx->fetched_data & 0xFF) >= 0x100;
+  }
+
+  //set the register
+  instruction_set_register(ctx->registers.a, data & 0xFFFF);
+  //set the flags
+  cpu_set_flags(z_flag, n_flag,  h_flag, c_flag);
+  
 }
 
 //rotate contents of register A to the right and update flag with value new bit 0 of register A
@@ -686,14 +720,62 @@ static void type_halt(cpu_context *ctx) {
   printf("HALT Instruction\n");
   ctx->halted = true;
 }
+
+//add contents of register 2 and the C flag to the contents of register A and store it there
+//set flags accordingly
 static void type_adc(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("ADC Instruction\n");
+  //get contents
+  u16 data = ctx->fetched_data;
+  u16 a_contents = ctx->registers.a;
+  bool c_contents = cpu_flag_C;
+
+  //update register A contents
+  ctx->registers.a = (data + a_contents + c_contents) & 0xFF;
+
+  //calculate 8-bit value if H and C flag are set
+  bool h_flag = (data & 0xF) + (a_contents & 0xF) + c_contents > 0xF;
+  bool c_flag = data + a_contents + c_contents > 0xFF;
+  //set flags
+  cpu_set_flags(ctx->registers.a == 0, 0, h_flag, c_flag);
 }
+
+//subtract contents of memory specified by register HL in register A
+// and store results in register A
 static void type_sub(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("SUB Instruction\n");
+  //read data from register A and other register
+  u32 data = instruction_read_register(ctx->current_instruction->register_1) - ctx->fetched_data;
+  
+  //define flag variables (for 8-bit instructions)
+  bool z_flag = data == 0;
+  bool n_flag = 1;
+  bool h_flag = (instruction_read_register(ctx->current_instruction->register_1) & 0xF) - (ctx->fetched_data & 0xF) < 0;
+  bool c_flag = ((int)instruction_read_register(ctx->current_instruction->register_1) & 0xFF) - ((int)ctx->fetched_data & 0xFF) < 0;
+
+  //set the register
+  instruction_set_register(ctx->current_instruction->register_1, data);
+  //set the flags
+  cpu_set_flags(z_flag, n_flag,  h_flag, c_flag);
 }
+
+//subtract contents of register 2 and the C flag to the contents of register A and store it there
+//set flags accordingly
 static void type_sbc(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("SBC Instruction\n");
+  //read data from register A and other register
+  long c_contents = (long) *cpu_flag_C;
+  u8 data = ctx->fetched_data + c_contents;
+  //define flag variables (for 8-bit instructions)
+  bool z_flag = instruction_read_register(ctx->current_instruction->register_1) - data == 0;
+  bool n_flag = 1;
+  bool h_flag = ((int)instruction_read_register(ctx->current_instruction->register_1) & 0xF) - ((int)ctx->fetched_data & 0xF) - ((long) cpu_flag_C) < 0;
+  bool c_flag = ((int)instruction_read_register(ctx->current_instruction->register_1) & 0xFF) - ((int)ctx->fetched_data & 0xFF) - ((long) cpu_flag_C) < 0;
+
+  //set the register
+  instruction_set_register(ctx->current_instruction->register_1, instruction_read_register(ctx->current_instruction->register_1) - data);
+  //set the flags
+  cpu_set_flags(z_flag, n_flag,  h_flag, c_flag);
 }
 
 //AND the contents of two register and save them to register A
@@ -732,6 +814,7 @@ static void type_cp(cpu_context *ctx) {
   
   cpu_set_flags(difference == 0,1, h_flag, difference < 0);
 }
+
 static void type_ret(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
   //TODO: needs Stack
@@ -764,6 +847,7 @@ static void type_rst(cpu_context *ctx) {
   jump_to_address(ctx, ctx->current_instruction->memory_address, true);
 }
 static void type_reti(cpu_context *ctx) {
+  //TODO: needs Stack
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
 
@@ -792,8 +876,13 @@ static void type_ldh(cpu_context *ctx) {
   }
   emulator_cycles(1);
 }
+
+//load contents of HL into program counter
+//next instruction starts at address specified by new pc value
 static void type_jphl(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("JPHL Instruction\n");
+  instruction_set_register(ctx->current_instruction->register_1, ctx->registers.pc);
+  bus_read(ctx->registers.pc);
 }
 static void type_cb(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
