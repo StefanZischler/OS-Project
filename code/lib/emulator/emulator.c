@@ -40,7 +40,6 @@ int emulator_run(int argc, char ** argv) {
     printf("CPU stopped running!\n");
     return -1;
     }
-    //ctx.ticks++;
   }
   
   return 0;
