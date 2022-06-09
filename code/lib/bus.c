@@ -1,5 +1,7 @@
 #include <bus.h>
 #include <rom.h>
+#include <ram.h>
+#include <cpu.h>
 
 /* Memory Map for the GameBoy
 0000	3FFF	ROM Bank 0
@@ -22,6 +24,36 @@ u8 bus_read(u16 address) {
     if (address < 0x8000) {
         //ROM/Cartridge Data
         return rom_read(address);
+    } else if (address < 0xA000) {
+        //Video RAM
+        //TODO: Implement ppu_read
+        return 0;
+    } else if (address < 0xC000) {
+        //Cartridge RAM
+        return rom_read(address);
+    } else if (address < 0xE000) {
+        //Working RAM (wram)
+        return work_ram_read(address);
+    } else if (address < 0xFE00) {
+        //ECHO RAM (not usable)
+        return 0;
+    } else if (address < 0xFEA0) {
+        //Sprite attribute table (OAM)
+        //TODO: Implement oam_write
+        return 0;
+    } else if (address < 0xFF00) {
+        //ECHO RAM (not usable)
+        return 0;
+    } else if (address < 0xFF80) {
+        //I/O Registers
+        //TODO: Implement io_write
+        return 0;
+    } else if (address < 0xFFFF) {
+        //High RAM (HRAM)	
+        return high_ram_read(address);
+    } else if (address == 0xFFFF) {
+        //Interrupt Enable register (IE)	
+        return cpu_get_ie_register();
     }
 }
 //write function for 16-bit address and 8-bit value
@@ -30,6 +62,36 @@ void bus_write(u16 address, u8 value) {
     if (address < 0x8000) {
         //ROM/Cartridge Data
         return rom_write(address, value);
+    } else if (address < 0xA000) {
+        //Video RAM
+        //TODO: Implement ppu_write
+        return;
+    } else if (address < 0xC000) {
+        //Cartridge RAM
+        return rom_write(address, value);
+    } else if (address < 0xE000) {
+        //Working RAM (wram)
+        return work_ram_write(address, value);
+    } else if (address < 0xFE00) {
+        //ECHO RAM (not usable)
+        return;
+    } else if (address < 0xFEA0) {
+        //Sprite attribute table (OAM)
+        //TODO: Implement oam_read
+        return;
+    } else if (address < 0xFF00) {
+        //ECHO RAM (not usable)
+        return;
+    } else if (address < 0xFF80) {
+        //I/O Registers
+        //TODO: Implement io_read
+        return;
+    } else if (address < 0xFFFF) {
+        //High RAM (HRAM)	
+        return high_ram_write(address, value);
+    } else if (address == 0xFFFF) {
+        //Interrupt Enable register (IE)	
+        return cpu_set_ie_register(value);
     }
 }
 

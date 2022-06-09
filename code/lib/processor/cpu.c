@@ -106,6 +106,15 @@ static bool check_flag(cpu_context *ctx){
   return false;
 }
 
+u8 cpu_get_ie_register() {
+  return ctx.ie_register;
+}
+
+void cpu_set_ie_register(u8 value) {
+  ctx.ie_register = value;
+}
+
+
 /* 
 HELPER FUNCTIONS
 */
@@ -471,7 +480,21 @@ static void type_ld(cpu_context *ctx) {
     emulator_cycles(1);
     return;
   }
-  //special case with HL_SP not implemented yet -> not sure if necessary for tetris
+  //special case with HL_SP 
+  if (ctx->current_instruction->components == AC_HL_SPR) {
+      //test if H flag needs to be set
+      u8 h_flag = (instruction_read_register(ctx->current_instruction->register_2) & 0xF) 
+      + (ctx->fetched_data & 0xF) >= 0x10;
+      //test if C flag needs to be set
+      u8 c_flag = (instruction_read_register(ctx->current_instruction->register_2) & 0xFF) 
+      + (ctx->fetched_data & 0xFF) >= 0x100;
+      //set H and C flag
+      cpu_set_flags(0,0, h_flag, c_flag);
+      //add 8-bit opperand to register HL
+      instruction_set_register(ctx->current_instruction->register_1,
+       instruction_read_register(ctx->current_instruction->register_2) + (int8_t) ctx->fetched_data);
+      return;
+  }
 
   //read data from second register from bus via fetch_data and load it into first register
   instruction_set_register(ctx->current_instruction->register_1, ctx->fetched_data);
@@ -628,7 +651,7 @@ static void type_daa(cpu_context *ctx) {
     value = 6;
   }  
   //if C flag set and N flag not set, OR value with 0x60 and set c_flag to 1
-  if (cpu_flag_C || (!cpu_flag_N && (ctx->registers.a > 0x99)) {
+  if (cpu_flag_C || (!cpu_flag_N && (ctx->registers.a > 0x99))) {
     value |= 0x60;
     c_flag = 1;
   }
@@ -655,7 +678,7 @@ static void type_scf(cpu_context *ctx) {
 //flip the Carry Flag (C Flag)
 static void type_ccf(cpu_context *ctx) {
   printf("CCF Instruction\n");
-  cpu_set_flags(-1,0,0,cpu_flag_C ^ 1);
+  cpu_set_flags(-1,0,0, !cpu_flag_C);
 }
 
 //set CPU halted to true
@@ -755,8 +778,19 @@ static void type_ei(cpu_context *ctx) {
   printf("EI Instruction\n");
   ctx->interrupt_master_enabled_flag = true;
 }
+
+//load or store data to/from register A to a address in range 0xFF00-0xFFFF
+//specified by register C
 static void type_ldh(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("LDH Instruction\n");
+  //if register 1 is A, load data from specified address into reg A, e.g. Ex3
+  if (ctx->current_instruction->register_1 == REG_A) {
+    instruction_set_register(ctx->current_instruction->register_1, bus_read(0xFF00 | ctx->fetched_data));
+  } else {
+    //if register 1 is not A, store data from A into specified address, e.g. Fx3
+    bus_write(ctx->memory_destination, ctx->registers.a);
+  }
+  emulator_cycles(1);
 }
 static void type_jphl(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);

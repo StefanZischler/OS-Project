@@ -35,6 +35,9 @@ typedef struct {
   //interrupt master flag
   bool interrupt_master_enabled_flag;  
 
+  //interrupt enable register (IE)
+  u8 ie_register;
+
   
   //interrupts
   bool ime;
@@ -51,6 +54,10 @@ void cpu_set_flag(bool n, int offset);
 
 void cpu_init();
 bool cpu_step();
+
+
+u8 cpu_get_ie_register();
+void cpu_set_ie_register(u8 value);
 
 typedef void (*INS_TYPE)(cpu_context *);
 
