@@ -615,17 +615,47 @@ static void type_rra(cpu_context *ctx) {
    // set C flag to bit value, all other to 0
    cpu_set_flags(0, 0,  0, value);
 }
+
+//adjust register A after addition and subtraction operations,
+//depends on which flag is set
 static void type_daa(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("DDA Instruction\n");
+  //initialize variables for updating reg A and flags
+  u8 value = 0;
+  bool c_flag = 0;
+  //if H flag set and N flag not set, set value to 6
+  if (cpu_flag_H || (!cpu_flag_N && (ctx->registers.a & 0xF) > 9)){
+    value = 6;
+  }  
+  //if C flag set and N flag not set, OR value with 0x60 and set c_flag to 1
+  if (cpu_flag_C || (!cpu_flag_N && (ctx->registers.a > 0x99)) {
+    value |= 0x60;
+    c_flag = 1;
+  }
+
+  //set flags
+  cpu_set_flags(ctx->registers.a == 0, -1, 0, c_flag);
 }
+
+//take complement of reg A and set flags
 static void type_cpl(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("CPL Instruction\n");
+  //compare reg A with its complement
+  ctx->registers.a = ~ctx->registers.a;
+  //set flags
+  cpu_set_flags(-1,1,1,-1);
 }
+
+//set the Carry Flag (C Flag)
 static void type_scf(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("SCF Instruction\n");
+  cpu_set_flags(-1,0,0,1);
 }
+
+//flip the Carry Flag (C Flag)
 static void type_ccf(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("CCF Instruction\n");
+  cpu_set_flags(-1,0,0,cpu_flag_C ^ 1);
 }
 
 //set CPU halted to true
@@ -642,41 +672,73 @@ static void type_sub(cpu_context *ctx) {
 static void type_sbc(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
 }
+
+//AND the contents of two register and save them to register A
 static void type_and(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("AND Instruction\n");
+  ctx->registers.a &= ctx->fetched_data & 0xFF;
+  cpu_set_flags(ctx->registers.a == 0,0,1,0);
 }
 
-//OR the contents of two register and save them to register A
+//XOR the contents of two register and save them to register A
 static void type_xor(cpu_context *ctx) {
   printf("XOR Instruction\n");
   ctx->registers.a ^= ctx->fetched_data & 0xFF;
   cpu_set_flags(ctx->registers.a == 0,0,0,0);
 }
+
+//OR the contents of two register and save them to register A
 static void type_or(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("OR Instruction\n");
+  ctx->registers.a |= ctx->fetched_data & 0xFF;
+  cpu_set_flags(ctx->registers.a == 0,0,0,0);
 }
+
+//Compare the contents of two register and set Z flag if they are equal
 static void type_cp(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("CP Instruction\n");
+  //calculate difference
+  int difference = (int)ctx->registers.a - (int)ctx->fetched_data;
+  //see if H flag needs to be set
+  bool h_flag;
+  if (((int)ctx->registers.a & 0x0F)- ((int)ctx->fetched_data & 0x0F) < 0) {
+    h_flag = 1;
+  } else {
+    h_flag = 0;
+  }
+  
+  cpu_set_flags(difference == 0,1, h_flag, difference < 0);
 }
 static void type_ret(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  //TODO: needs Stack
 }
 static void type_pop(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  //TODO: needs Stack
 }
 
 //jump to a certain point in memory if the right flag is set
 static void type_jp(cpu_context *ctx) {
+  printf("JUMP Instruction\n");
   jump_to_address(ctx, ctx->fetched_data, false);
 }
+
+//tests if flag Z/C is 0/1 and the puts the next two bytes of program counter on stack
+// and the a16-bit operand loaded into pc
 static void type_call(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("CALL Instruction\n");
+  jump_to_address(ctx, ctx->fetched_data, true);
 }
 static void type_push(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  //TODO: needs Stack
 }
+
+//push contents of pc on to stack and load first byte of 0x00 memory address -> 1 of 8 addresses
 static void type_rst(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("RST Instruction\n");
+  jump_to_address(ctx, ctx->current_instruction->memory_address, true);
 }
 static void type_reti(cpu_context *ctx) {
   printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
