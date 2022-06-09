@@ -461,7 +461,7 @@ static void type_ld(cpu_context *ctx) {
     //LD A, (BC) for example
 
     //test if second register is a 16-bit register
-    if (ctx->current_instance->register_2 >= REG_BC) {
+    if (ctx->current_instruction->register_2 >= REG_BC) {
       emulator_cycles(1);
       bus_write_16(ctx->memory_destination, ctx->fetched_data);
     } else {
@@ -482,15 +482,15 @@ static void type_ld(cpu_context *ctx) {
 static void type_inc(cpu_context *ctx) {
   printf("Incriment Instruction\n");
   //get current value of register and increment it by 1
-  u16 value = instruction_read_register(ctx->current_instance->register_1) + 1;
+  u16 value = instruction_read_register(ctx->current_instruction->register_1) + 1;
 
   //if 16-bit register involved needs an extra emulator cycle
-  if (ctx->current_instance->register_2 >= REG_BC) {
+  if (ctx->current_instruction->register_2 >= REG_BC) {
       emulator_cycles(1);
     }
   
   //special case with memory register HL
-  if (ctx->current_instance->register_1 == REG_HL && ctx->current_instance->components == AC_MR) {
+  if (ctx->current_instruction->register_1 == REG_HL && ctx->current_instruction->components == AC_MR) {
     //read, incriment value by 1 and then write value from HL to bus
     value = bus_read(instruction_read_register(REG_HL)) + 1;
     value &= 0xFF;
@@ -512,15 +512,15 @@ static void type_inc(cpu_context *ctx) {
 static void type_dec(cpu_context *ctx) {
   printf("Decriment Instruction\n");
   //get current value of register and decriment it by 1
-  u16 value = instruction_read_register(ctx->current_instance->register_1) - 1;
+  u16 value = instruction_read_register(ctx->current_instruction->register_1) - 1;
 
   //if 16-bit register involved needs an extra emulator cycle
-  if (ctx->current_instance->register_2 >= REG_BC) {
+  if (ctx->current_instruction->register_2 >= REG_BC) {
       emulator_cycles(1);
     }
   
   //special case with memory register HL
-  if (ctx->current_instance->register_1 == REG_HL && ctx->current_instance->components == AC_MR) {
+  if (ctx->current_instruction->register_1 == REG_HL && ctx->current_instruction->components == AC_MR) {
     //read, decriment value by 1 and then write value from HL to bus
     value = bus_read(instruction_read_register(REG_HL)) - 1;
     value &= 0xFF;
@@ -579,7 +579,7 @@ static void type_rla(cpu_context *ctx) {
   //get register contents 
    u8 contents = ctx->registers.a;
    //get C flag contents
-   u8 c_flag = cpu_flag_C;
+   bool c_flag = cpu_flag_C;
    //update C flag contents with first bit of register A
    u8 c_content = (contents >> 7) & 1;
    //rotate contents of A to the left by one and OR with c_flag 
@@ -590,6 +590,7 @@ static void type_rla(cpu_context *ctx) {
 
 //if Z flag is set jump s8 steps from current address in program counter
 static void type_jr(cpu_context *ctx) {
+  printf("JR Instruction\n");
   // get the s8 steps from bus
   int8_t steps = (int8_t) (ctx->fetched_data & 0xFF);
   //calculate address (current pc + steps)
@@ -606,7 +607,7 @@ static void type_rra(cpu_context *ctx) {
   //save first bit value
    u8 value = ctx->registers.a & 1;
    //get C flag contents
-   u8 c_flag = cpu_flag_C;
+   bool c_flag = cpu_flag_C;
    //rotate contents of A register to the right by one
    ctx->registers.a >>= 1;
    //OR contents of A with C flag (shifted to the last bit of A) to update A contents
