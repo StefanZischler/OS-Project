@@ -8,8 +8,8 @@ LIB = ../lib/
 
 all: gb_emulator
 
-gb_emulator: main.o emulator.o instruction_set.o interrupts.o cpu.o bus.o ram.o rom.o stack.o timer.o
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(PROC)cpu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
+gb_emulator: main.o emulator.o instruction_set.o interrupts.o cpu.o joypad.o io.o bus.o ram.o rom.o stack.o timer.o
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(PROC)cpu.o $(LIB)joypad.o $(LIB)io.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
@@ -25,6 +25,12 @@ interrupts.o: $(INCL)interrupts.h $(INCL)cpu.h $(INCL)stack.h
 
 cpu.o: $(INCL)cpu.h $(INCL)emulator.h $(INCL)interrupts.h $(INCL)instruction_set.h $(INCL)bus.h $(INCL)stack.h
 	gcc -o $(PROC)cpu.o -c $(PROC)cpu.c -I$(INCL)
+
+joypad.o: $(INCL)joypad.h $(INCL)define.h 
+	gcc -o $(LIB)joypad.o -c $(LIB)joypad.c -I$(INCL)
+
+io.o: $(INCL)define.h 
+	gcc -o $(LIB)io.o -c $(LIB)io.c -I$(INCL)
 
 bus.o: $(INCL)bus.h $(INCL)define.h $(INCL)ram.h $(INCL)cpu.h 
 	gcc -o $(LIB)bus.o -c $(LIB)bus.c -I$(INCL)
