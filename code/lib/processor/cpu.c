@@ -423,6 +423,7 @@ bool cpu_step () {
     ctx.halted = false;
   }
   
+  cpu_handle_interrupts(&ctx);
 
   return true;
 }
