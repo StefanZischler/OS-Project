@@ -40,7 +40,6 @@ typedef struct {
 
   
   //interrupts
-  bool ime;
   u8 interrupt_flag;
 } cpu_context;
 
@@ -51,6 +50,8 @@ bool cpu_flag_C();
 
 void cpu_set_flags(bool z, bool n, bool h, bool c);
 void cpu_set_flag(bool n, int offset);
+
+cpu_context* cpu_get_context();
 
 void cpu_init();
 bool cpu_step();

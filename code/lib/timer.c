@@ -42,7 +42,7 @@ void timer_tick() {
       //reset TIMA
       ctx.tima = ctx.tma;
       
-      cpu_request_interrupt(INTERRUPT_TIMER);
+      cpu_request_interrupt(cpu_get_context(), INTERRUPT_TIMER);
     }
   }
 }

@@ -1,11 +1,24 @@
+#include <stdio.h>
+
 #include <interrupts.h>
 #include <cpu.h>
 #include <stack.h>
 
 void interrupt_handle(cpu_context *ctx, interrupt_type type, u16 address);
 
+//requests an interrupt by setting the corresponding interrupt flag
+void cpu_request_interrupt(cpu_context *ctx, interrupt_type type) {
+  ctx->interrupt_flag = ctx->interrupt_flag | type;
+}
+
 //handles requested interrupts if they are enabled
 void cpu_handle_interrupts(cpu_context *ctx) {
+  //if at least one interrupt is pending, the cpu wakes up
+  //even if IME is not set
+  if(ctx->interrupt_flag) {
+    ctx->halted = false;
+  }
+
   //if IME is false, no interrupts may be handled
   if(ctx->interrupt_master_enabled_flag) {
     if(ctx->interrupt_flag & INTERRUPT_VBLANK && ctx->ie_register & INTERRUPT_VBLANK) {
@@ -33,6 +46,7 @@ void cpu_handle_interrupts(cpu_context *ctx) {
 
 //helper method
 void interrupt_handle(cpu_context *ctx, interrupt_type type, u16 address) {
+  printf("handle interrupt %d\n", type);
   //reset IME and interrupt flag for interrupt type
   ctx->interrupt_master_enabled_flag = false;
   ctx->interrupt_flag &= ~INTERRUPT_VBLANK;
