@@ -4,6 +4,11 @@
 
 void interrupt_handle(cpu_context *ctx, interrupt_type type, u16 address);
 
+//requests an interrupt by setting the corresponding interrupt flag
+void cpu_request_interrupt(cpu_context *ctx, interrupt_type type) {
+  ctx->interrupt_flag = ctx->interrupt_flag | type;
+}
+
 //handles requested interrupts if they are enabled
 void cpu_handle_interrupts(cpu_context *ctx) {
   //if IME is false, no interrupts may be handled

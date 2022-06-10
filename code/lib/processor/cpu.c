@@ -10,6 +10,10 @@
 
 cpu_context ctx = {0};
 
+cpu_context* cpu_get_context() {
+  return &ctx;
+}
+
 void cpu_init() {
   //set program counter to initial value
   ctx.registers.pc = 0x100;
@@ -443,11 +447,6 @@ bool cpu_step () {
   
 
   return true;
-}
-
-//requests an interrupt by setting the corresponding interrupt flag
-void cpu_request_interrupt(interrupt_type type) {
-  ctx.interrupt_flag = ctx.interrupt_flag | type;
 }
 
 //if no instruction this function should be called

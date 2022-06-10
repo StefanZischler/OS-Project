@@ -52,6 +52,8 @@ bool cpu_flag_C();
 void cpu_set_flags(bool z, bool n, bool h, bool c);
 void cpu_set_flag(bool n, int offset);
 
+cpu_context* cpu_get_context();
+
 void cpu_init();
 bool cpu_step();
 
