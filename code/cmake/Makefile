@@ -23,7 +23,7 @@ instruction_set.o: $(INCL)instruction_set.h $(INCL)cpu.h $(INCL)bus.h $(INCL)def
 interrupts.o: $(INCL)interrupts.h $(INCL)cpu.h $(INCL)stack.h
 	gcc -o $(PROC)interrupts.o -c $(PROC)interrupts.c -I$(INCL)
 
-cpu.o: $(INCL)cpu.h $(INCL)emulator.h $(INCL)interrupts.h $(INCL)instruction_set.h $(INCL)bus.h 
+cpu.o: $(INCL)cpu.h $(INCL)emulator.h $(INCL)interrupts.h $(INCL)instruction_set.h $(INCL)bus.h $(INCL)stack.h
 	gcc -o $(PROC)cpu.o -c $(PROC)cpu.c -I$(INCL)
 
 bus.o: $(INCL)bus.h $(INCL)define.h $(INCL)ram.h $(INCL)cpu.h 

@@ -123,6 +123,7 @@ typedef enum {
     REG_NONE,
     //8-bit registers
     REG_A,
+    REG_F,
     REG_B,
     REG_C,
     REG_D,

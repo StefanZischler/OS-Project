@@ -6,6 +6,7 @@
 #include <interrupts.h>
 #include <emulator.h>
 #include <bus.h>
+#include <stack.h>
 
 
 cpu_context ctx = {0};
@@ -175,12 +176,77 @@ u16 instruction_set_register(register_type register_type, u16 value) {
     }
 }
 
+/*
+0xCB instruction set
+*/
+u16 cb_read_register(register_type register_type) {
+    switch(register_type) {
+        //8-bit registers
+        case REG_A: return ctx.registers.a;
+        case REG_F: return ctx.registers.f;
+        case REG_B: return ctx.registers.b;
+        case REG_C: return ctx.registers.c;
+        case REG_D: return ctx.registers.d;
+        case REG_E: return ctx.registers.e;
+        case REG_H: return ctx.registers.h;
+        case REG_L: return ctx.registers.l;
+        
+        //16-bit registers
+        case REG_HL: return bus_read(instruction_read_register(REG_HL));
+        
+        //default
+        default: return 0;
+    }
+}
+
+//special helper function for 0xCB instruction set
+u16 cb_set_register(register_type reg_type, u16 value) {
+    switch(reg_type) {
+        //8-bit registers
+        case REG_A: ctx.registers.a = value & 0xFF; break;
+        case REG_F: ctx.registers.f = value & 0xFF; break;
+        case REG_B: ctx.registers.b = value & 0xFF; break;
+        case REG_C: ctx.registers.c = value & 0xFF; break;
+        case REG_D: ctx.registers.d = value & 0xFF; break;
+        case REG_E: ctx.registers.e = value & 0xFF; break;
+        case REG_H: ctx.registers.h = value & 0xFF; break;
+        case REG_L: ctx.registers.l = value & 0xFF; break;
+        
+        //16-bit registers
+        case REG_HL: bus_write(instruction_read_register(REG_HL), value);break;
+      
+        //default
+        default: break;
+    }
+}
+
+//helper function to look up registers 
+register_type standart_registers[] = {
+  REG_A,
+  REG_B,
+  REG_C,
+  REG_D,
+  REG_E,
+  REG_H,
+  REG_L,
+  REG_HL
+};
+
+//return correct register for bit operation
+register_type get_register_type(u8 register) {
+  if (register > 0b111) {
+    return REG_NONE;
+  }
+
+  return standart_registers[register];
+}
+
 //function to jump to a specific address in program counter, used for example in proc_jr function
 static void jump_to_address (cpu_context *ctx, u16 address, bool is_data_pushed_pc) {
   if (check_flag(ctx)) {
     if(is_data_pushed_pc) {
       emulator_cycles(2);
-      //TODO: stack push 16 address to register pc
+      stack_push16(ctx->registers.pc);
     }
     ctx->registers.pc = address;
     emulator_cycles(1);
@@ -815,13 +881,50 @@ static void type_cp(cpu_context *ctx) {
   cpu_set_flags(difference == 0,1, h_flag, difference < 0);
 }
 
+//depending if Z flag is set pop the program counter from stack and continue the subroutine
 static void type_ret(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
-  //TODO: needs Stack
+  printf("RET Instruction\n");
+  //check in no flag is set -> extra emulator cycle
+  if (ctx->current_instruction->flag != FL_NONE) {
+    emulator_cycles(1);
+  }
+
+  //check flag and pop from stack
+  if (check_flag(ctx)) {
+    u16 low = stack_pop8();
+    emulator_cycles(1);
+    u16 high = stack_pop8();
+    emulator_cycles(1);
+
+    u16 value = (high <<8) | low;
+    ctx->registers.pc = value;
+    emulator_cycles(1);
+  }
+
+
+  
 }
+
+//pop contents of stack into register pair
+// 1.) load contents of Stack pointer into lower portion of register pair
+// 2.) add 1 to Stack pointer and add new value to higher portion of register pair
+// 3.) SP should at the end be 2 steps further 
 static void type_pop(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
-  //TODO: needs Stack
+  printf("POP Instruction\n");
+  u16 low = stack_pop8();
+  emulator_cycles(1);
+  u16 high = stack_pop8();
+  emulator_cycles(1);
+
+  u16 value = (high << 8) | low;
+
+  instruction_set_register(ctx->current_instruction->register_1, value);
+
+  //special case if AF register pair
+  if(ctx->current_instruction->components == REG_AF) {
+    instruction_set_register(ctx->current_instruction->register_1, value & 0xFFF0);
+  }
+  
 }
 
 //jump to a certain point in memory if the right flag is set
@@ -836,9 +939,18 @@ static void type_call(cpu_context *ctx) {
   printf("CALL Instruction\n");
   jump_to_address(ctx, ctx->fetched_data, true);
 }
+
+//push contents of register pair on to stack
 static void type_push(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
-  //TODO: needs Stack
+  printf("PUSH Instruction\n");
+  u16 high = (instruction_read_register(ctx->current_instruction->register_1) >> 8) & 0xFF;
+  emulator_cycles(1);
+  stack_push8(high);
+  u16 low = instruction_read_register(ctx->current_instruction->register_1) & 0xFF;
+  emulator_cycles(1);
+  stack_push8(low);
+
+ emulator_cycles(1);
 }
 
 //push contents of pc on to stack and load first byte of 0x00 memory address -> 1 of 8 addresses
@@ -846,9 +958,12 @@ static void type_rst(cpu_context *ctx) {
   printf("RST Instruction\n");
   jump_to_address(ctx, ctx->current_instruction->memory_address, true);
 }
+
+//same as RET instruction but also enable instruction master flag
 static void type_reti(cpu_context *ctx) {
-  //TODO: needs Stack
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("RETI Instruction\n");
+  ctx->interrupt_master_enabled_flag = true;
+  type_ret(ctx);
 }
 
 //disable interrupt master flag
@@ -884,8 +999,163 @@ static void type_jphl(cpu_context *ctx) {
   instruction_set_register(ctx->current_instruction->register_1, ctx->registers.pc);
   bus_read(ctx->registers.pc);
 }
+
+//special instruction which has its own instruction table 
+//16-bit opcodes where first 8-bit are 0xCB second 8-bit is new opcode
 static void type_cb(cpu_context *ctx) {
-  printf("Instruction %02X not implemented yet...\n", ctx->current_opcode);
+  printf("Entering CxB \n");
+  //get new opcode
+  u8 new_opcode = ctx->fetched_data;
+  //get register for new opcode, masked it with 0b111 to get register
+  register_type register = get_register_type(new_opcode & 0b111);
+  //get instruction from new opcode x00-x3F
+  u8 new_instruction = (new_opcode >> 3) & 0b111;
+  //get which bit operation is called x40-xFF
+  u8 bit_operations = (new_opcode >> 6) & 0b11;
+  //read from register
+  u8 register_value = cb_read_register(register);
+
+  emulator_cycles(1);
+
+  //if memory register HL is used -> needs more emulator cycles
+  if (register == REG_HL) {
+    emulator_cycles(2);
+  }
+
+  //new instructions 0x00-0x3F
+  switch (new_instruction) {
+    case 0: {
+      printf("RLC Instruction \n");
+      //RLC
+      //rotate contents of register to the left and set C flag depending on bit
+      bool c_flag = false;
+      u8 new_value = (register_value << 1) & 0xFF;
+
+      if ((new_value & (1 << 7)) != 0) {
+        new_value |= 1;
+        c_flag = true;
+      }
+
+      cb_set_register(register, new_value);
+      cpu_set_flags(new_value == 0, false, false, c_flag);
+    } return;
+
+    case 1: {
+      printf("RRC Instruction \n");
+      //RRC
+      //rotate contents of register to the right and set flags accordingly
+      u8 old_value = register_value;
+      register_value >>= 1;
+      register_value |= (old_value << 7);
+      
+      cb_set_register(register, old_value);
+      cpu_set_flags(!old_value, false, false, old_value & 1);
+      } return;
+
+    case 2: {
+      printf("RL Instruction \n");
+      //RL
+      //rotate contents of register to the left and copy contents of C flag into register
+      //set flags accordingly
+      u8 old_value = register_value;
+      register_value <<= 1;
+      register_value |= cpu_flag_C;
+      
+      cb_set_register(register, old_value);
+      cpu_set_flags(!old_value, false, false, (old_value & 0x80));
+    } return;
+
+    case 3: {
+      printf("RR Instruction \n");
+      //RR
+      //rotate contents of register to the right and copy contents of C flag into register
+      u8 old_value = register_value;
+      register_value >>= 1;
+      register_value |= (long)(cpu_flag_C << 7);
+      
+      cb_set_register(register, old_value);
+      cpu_set_flags(!old_value, false, false, old_value & 1);
+    } return;
+
+    case 4: {
+      printf("SLA Instruction \n");
+      //SLA
+      //rotate contents of register to the left and set C flag accordingly
+      u8 old_value = register_value;
+      register_value <<= 1;
+      register_value |= (long)cpu_flag_C;
+      
+      cb_set_register(register, old_value);
+      cpu_set_flags(!old_value, false, false, (old_value & 0x80));
+    } return;
+
+    case 5: {
+      printf("SRA Instruction \n");
+      //SRA
+      //rotate contents of register to the right and 
+      //copy contents to C flag, bit 7 of register unchanged
+      u8 old_value =  (int8_t)register_value >> 1;
+     
+      cb_set_register(register, old_value);
+      cpu_set_flags(!old_value, false, false, old_value & 1);
+    } return;
+
+    case 6: {
+      printf("SWAP Instruction \n");
+      //SWAP
+      //swap the contents of the lower 4-bit into the higher 4-bits and vice versa
+      u8 low = ((register_value & 0xF0) >> 4);
+      u8 high = ((register_value & 0xF0) << 4);
+      register_value = low | high;
+
+      cb_set_register(register, register_value);
+      cpu_set_flags(register_value == 0, false, false, false);
+    } return;
+
+    case 7: {
+      printf("SRL Instruction \n");
+      //SRL
+      //rotate contents of register to the right and set 
+      // and contents of bit 0 are copied to C flag
+      u8 old_value =  register_value >> 1;
+     
+      cb_set_register(register, old_value);
+      cpu_set_flags(!old_value, false, false, register_value & 1);
+    } return;    
+  }
+
+  //bit operations
+  switch (bit_operations)
+  {
+  case 1:
+    ("BIT Instruction \n");
+    //BIT
+    //copy complement of bit 0 of register
+    //change flags
+    u8 complement = !(register_value & (1 << bit));
+    cpu_set_flags(complement, false, true, -1);
+    return;
+
+  case 2:
+    ("RES Instruction \n");
+    //RES
+    //reset specified bit in register
+    register_value &= ~(1 << bit_operations);
+    cb_set_register(register, register_value);
+    return;
+
+  case 3:
+    ("SET Instruction \n");
+    //SET
+    //set specified bit in register
+    register_value |= (1 << bit_operations);
+    cb_set_register(register, register_value);
+    return;
+    
+  default:
+    return;
+  }
+  return;
 }
 
 // helper function to map instruction type from instruction set to a responding function 
