@@ -29,12 +29,12 @@ void cpu_init() {
   *((short *)&ctx.registers.d) = 0x4D01;
 
   //print values for debugging
-  printf("pc: %d\n", ctx.registers.pc);
-  printf("sp: %d\n", ctx.registers.sp);
-  printf("Z-flag: %d\n", cpu_flag_Z());
-  printf("N-flag: %d\n", cpu_flag_N());
-  printf("H-flag: %d\n", cpu_flag_H());
-  printf("C-flag: %d\n", cpu_flag_C());
+  //printf("pc: %d\n", ctx.registers.pc);
+  //printf("sp: %d\n", ctx.registers.sp);
+  //printf("Z-flag: %d\n", cpu_flag_Z());
+  //printf("N-flag: %d\n", cpu_flag_N());
+  //printf("H-flag: %d\n", cpu_flag_H());
+  //printf("C-flag: %d\n", cpu_flag_C());
 
   ctx.interrupt_master_enabled_flag = false;
   
@@ -200,27 +200,6 @@ u16 cb_set_register(register_type reg_type, u16 value) {
         //default
         default: break;
     }
-}
-
-//helper function to look up registers 
-register_type standart_registers[] = {
-  REG_A,
-  REG_B,
-  REG_C,
-  REG_D,
-  REG_E,
-  REG_H,
-  REG_L,
-  REG_HL
-};
-
-//return correct register for bit operation
-register_type get_register_type(u8 register) {
-  if (register > 0b111) {
-    return REG_NONE;
-  }
-
-  return standart_registers[register];
 }
 
 //function to jump to a specific address in program counter, used for example in proc_jr function
@@ -503,12 +482,12 @@ static void type_none(cpu_context *ctx) {
 //NOP instruction -> does nothing
 static void type_nop(cpu_context *ctx) {
   //This function should do nothing
-  printf("NOP Instruction\n");
+  //printf("NOP Instruction\n");
 }
 
 //load either a d8/d16 value or from another register 2 into a register 1, special case with memory register HL
 static void type_ld(cpu_context *ctx) {
-  printf("LOAD Instruction\n");
+  //printf("LOAD Instruction\n");
 
   if (ctx->destination_is_in_memory) {
     //LD A, (BC) for example
@@ -547,7 +526,7 @@ static void type_ld(cpu_context *ctx) {
 
 //incriment the value in register
 static void type_inc(cpu_context *ctx) {
-  printf("Incriment Instruction\n");
+  //printf("Incriment Instruction\n");
   //get current value of register and increment it by 1
   u16 value = instruction_read_register(ctx->current_instruction->register_1) + 1;
 
@@ -577,7 +556,7 @@ static void type_inc(cpu_context *ctx) {
 
 //decriment the value in register
 static void type_dec(cpu_context *ctx) {
-  printf("Decriment Instruction\n");
+  //printf("Decriment Instruction\n");
   //get current value of register and decriment it by 1
   u16 value = instruction_read_register(ctx->current_instruction->register_1) - 1;
 
@@ -606,7 +585,7 @@ static void type_dec(cpu_context *ctx) {
 
 //rotate contents of register A to the left and update flag with value new bit 0 of register A
 static void type_rlca(cpu_context *ctx) {
-   printf("RLCA Instruction\n");
+   //printf("RLCA Instruction\n");
    
    //get 0 bit value
    u8 value = ctx->registers.a;
@@ -622,7 +601,7 @@ static void type_rlca(cpu_context *ctx) {
 
 //add the contents of 8-bit operand d8 or from a register, into register A and update flags
 static void type_add(cpu_context *ctx) {
-  printf("ADD Instruction\n");
+  //printf("ADD Instruction\n");
   //read data from register A and other register
   u32 data = instruction_read_register(ctx->current_instruction->register_1) + ctx->fetched_data;
   
@@ -659,7 +638,7 @@ static void type_add(cpu_context *ctx) {
 
 //rotate contents of register A to the right and update flag with value new bit 0 of register A
 static void type_rrc(cpu_context *ctx) {
-  printf("RCC Instruction\n");
+  //printf("RCC Instruction\n");
    
    //save first bit value
    u8 value = ctx->registers.a & 1;
@@ -676,7 +655,7 @@ static void type_stop(cpu_context *ctx) {
 
 //rotate contents of register A to the left by one and update 0-bit with contents of C flag
 static void type_rla(cpu_context *ctx) {
-  printf("RLA Instruction\n");
+  //printf("RLA Instruction\n");
   //get register contents 
    u8 contents = ctx->registers.a;
    //get C flag contents
@@ -691,7 +670,7 @@ static void type_rla(cpu_context *ctx) {
 
 //if Z flag is set jump s8 steps from current address in program counter
 static void type_jr(cpu_context *ctx) {
-  printf("JR Instruction\n");
+  //printf("JR Instruction\n");
   // get the s8 steps from bus
   int8_t steps = (int8_t) (ctx->fetched_data & 0xFF);
   //calculate address (current pc + steps)
@@ -704,7 +683,7 @@ static void type_jr(cpu_context *ctx) {
 
 //rotate contents of register A to the right by one and update 0-bit with contents of C flag
 static void type_rra(cpu_context *ctx) {
-  printf("RRA Instruction\n");
+  //printf("RRA Instruction\n");
   //save first bit value
    u8 value = ctx->registers.a & 1;
    //get C flag contents
@@ -720,7 +699,7 @@ static void type_rra(cpu_context *ctx) {
 //adjust register A after addition and subtraction operations,
 //depends on which flag is set
 static void type_daa(cpu_context *ctx) {
-  printf("DDA Instruction\n");
+  //printf("DDA Instruction\n");
   //initialize variables for updating reg A and flags
   u8 value = 0;
   bool c_flag = 0;
@@ -740,7 +719,7 @@ static void type_daa(cpu_context *ctx) {
 
 //take complement of reg A and set flags
 static void type_cpl(cpu_context *ctx) {
-  printf("CPL Instruction\n");
+  //printf("CPL Instruction\n");
   //compare reg A with its complement
   ctx->registers.a = ~ctx->registers.a;
   //set flags
@@ -749,26 +728,26 @@ static void type_cpl(cpu_context *ctx) {
 
 //set the Carry Flag (C Flag)
 static void type_scf(cpu_context *ctx) {
-  printf("SCF Instruction\n");
+  //printf("SCF Instruction\n");
   cpu_set_flags(-1,0,0,1);
 }
 
 //flip the Carry Flag (C Flag)
 static void type_ccf(cpu_context *ctx) {
-  printf("CCF Instruction\n");
+  //printf("CCF Instruction\n");
   cpu_set_flags(-1,0,0, !cpu_flag_C);
 }
 
 //set CPU halted to true
 static void type_halt(cpu_context *ctx) {
-  printf("HALT Instruction\n");
+  //printf("HALT Instruction\n");
   ctx->halted = true;
 }
 
 //add contents of register 2 and the C flag to the contents of register A and store it there
 //set flags accordingly
 static void type_adc(cpu_context *ctx) {
-  printf("ADC Instruction\n");
+  //printf("ADC Instruction\n");
   //get contents
   u16 data = ctx->fetched_data;
   u16 a_contents = ctx->registers.a;
@@ -787,7 +766,7 @@ static void type_adc(cpu_context *ctx) {
 //subtract contents of memory specified by register HL in register A
 // and store results in register A
 static void type_sub(cpu_context *ctx) {
-  printf("SUB Instruction\n");
+  //printf("SUB Instruction\n");
   //read data from register A and other register
   u32 data = instruction_read_register(ctx->current_instruction->register_1) - ctx->fetched_data;
   
@@ -806,7 +785,7 @@ static void type_sub(cpu_context *ctx) {
 //subtract contents of register 2 and the C flag to the contents of register A and store it there
 //set flags accordingly
 static void type_sbc(cpu_context *ctx) {
-  printf("SBC Instruction\n");
+  //printf("SBC Instruction\n");
   //read data from register A and other register
   long c_contents = (long) *cpu_flag_C;
   u8 data = ctx->fetched_data + c_contents;
@@ -824,28 +803,28 @@ static void type_sbc(cpu_context *ctx) {
 
 //AND the contents of two register and save them to register A
 static void type_and(cpu_context *ctx) {
-  printf("AND Instruction\n");
+  //printf("AND Instruction\n");
   ctx->registers.a &= ctx->fetched_data & 0xFF;
   cpu_set_flags(ctx->registers.a == 0,0,1,0);
 }
 
 //XOR the contents of two register and save them to register A
 static void type_xor(cpu_context *ctx) {
-  printf("XOR Instruction\n");
+  //printf("XOR Instruction\n");
   ctx->registers.a ^= ctx->fetched_data & 0xFF;
   cpu_set_flags(ctx->registers.a == 0,0,0,0);
 }
 
 //OR the contents of two register and save them to register A
 static void type_or(cpu_context *ctx) {
-  printf("OR Instruction\n");
+  //printf("OR Instruction\n");
   ctx->registers.a |= ctx->fetched_data & 0xFF;
   cpu_set_flags(ctx->registers.a == 0,0,0,0);
 }
 
 //Compare the contents of two register and set Z flag if they are equal
 static void type_cp(cpu_context *ctx) {
-  printf("CP Instruction\n");
+  //printf("CP Instruction\n");
   //calculate difference
   int difference = (int)ctx->registers.a - (int)ctx->fetched_data;
   //see if H flag needs to be set
@@ -861,7 +840,7 @@ static void type_cp(cpu_context *ctx) {
 
 //depending if Z flag is set pop the program counter from stack and continue the subroutine
 static void type_ret(cpu_context *ctx) {
-  printf("RET Instruction\n");
+  //printf("RET Instruction\n");
   //check in no flag is set -> extra emulator cycle
   if (ctx->current_instruction->flag != FL_NONE) {
     emulator_cycles(1);
@@ -888,7 +867,7 @@ static void type_ret(cpu_context *ctx) {
 // 2.) add 1 to Stack pointer and add new value to higher portion of register pair
 // 3.) SP should at the end be 2 steps further 
 static void type_pop(cpu_context *ctx) {
-  printf("POP Instruction\n");
+  //printf("POP Instruction\n");
   u16 low = stack_pop8();
   emulator_cycles(1);
   u16 high = stack_pop8();
@@ -907,20 +886,20 @@ static void type_pop(cpu_context *ctx) {
 
 //jump to a certain point in memory if the right flag is set
 static void type_jp(cpu_context *ctx) {
-  printf("JUMP Instruction\n");
+  //printf("JUMP Instruction\n");
   jump_to_address(ctx, ctx->fetched_data, false);
 }
 
 //tests if flag Z/C is 0/1 and the puts the next two bytes of program counter on stack
 // and the a16-bit operand loaded into pc
 static void type_call(cpu_context *ctx) {
-  printf("CALL Instruction\n");
+  //printf("CALL Instruction\n");
   jump_to_address(ctx, ctx->fetched_data, true);
 }
 
 //push contents of register pair on to stack
 static void type_push(cpu_context *ctx) {
-  printf("PUSH Instruction\n");
+  //printf("PUSH Instruction\n");
   u16 high = (instruction_read_register(ctx->current_instruction->register_1) >> 8) & 0xFF;
   emulator_cycles(1);
   stack_push8(high);
@@ -933,33 +912,33 @@ static void type_push(cpu_context *ctx) {
 
 //push contents of pc on to stack and load first byte of 0x00 memory address -> 1 of 8 addresses
 static void type_rst(cpu_context *ctx) {
-  printf("RST Instruction\n");
+  //printf("RST Instruction\n");
   jump_to_address(ctx, ctx->current_instruction->memory_address, true);
 }
 
 //same as RET instruction but also enable instruction master flag
 static void type_reti(cpu_context *ctx) {
-  printf("RETI Instruction\n");
+  //printf("RETI Instruction\n");
   ctx->interrupt_master_enabled_flag = true;
   type_ret(ctx);
 }
 
 //disable interrupt master flag
 static void type_di(cpu_context *ctx) {
-  printf("DI Instruction\n");
+  //printf("DI Instruction\n");
   ctx->interrupt_master_enabled_flag = false;
 }
 
 //enable interrupt master flag
 static void type_ei(cpu_context *ctx) {
-  printf("EI Instruction\n");
+  //printf("EI Instruction\n");
   ctx->interrupt_master_enabled_flag = true;
 }
 
 //load or store data to/from register A to a address in range 0xFF00-0xFFFF
 //specified by register C
 static void type_ldh(cpu_context *ctx) {
-  printf("LDH Instruction\n");
+  //printf("LDH Instruction\n");
   //if register 1 is A, load data from specified address into reg A, e.g. Ex3
   if (ctx->current_instruction->register_1 == REG_A) {
     instruction_set_register(ctx->current_instruction->register_1, bus_read(0xFF00 | ctx->fetched_data));
@@ -973,37 +952,59 @@ static void type_ldh(cpu_context *ctx) {
 //load contents of HL into program counter
 //next instruction starts at address specified by new pc value
 static void type_jphl(cpu_context *ctx) {
-  printf("JPHL Instruction\n");
+  //printf("JPHL Instruction\n");
   instruction_set_register(ctx->current_instruction->register_1, ctx->registers.pc);
   bus_read(ctx->registers.pc);
 }
 
+//helper function to look up registers 
+register_type standart_registers[] = {
+  REG_A,
+  REG_B,
+  REG_C,
+  REG_D,
+  REG_E,
+  REG_H,
+  REG_L,
+  REG_HL
+};
+
+//return correct register for bit operation
+register_type get_register_type(u8 regi) {
+  if (regi > 0b111) {
+    return REG_NONE;
+  }
+
+  return standart_registers[regi];
+}
+
+
 //special instruction which has its own instruction table 
 //16-bit opcodes where first 8-bit are 0xCB second 8-bit is new opcode
 static void type_cb(cpu_context *ctx) {
-  printf("Entering CxB \n");
+  printf("Entering 0xCB \n");
   //get new opcode
   u8 new_opcode = ctx->fetched_data;
   //get register for new opcode, masked it with 0b111 to get register
-  register_type register = get_register_type(new_opcode & 0b111);
+  register_type regi = get_register_type(new_opcode & 0b111);
   //get instruction from new opcode x00-x3F
   u8 new_instruction = (new_opcode >> 3) & 0b111;
   //get which bit operation is called x40-xFF
   u8 bit_operations = (new_opcode >> 6) & 0b11;
   //read from register
-  u8 register_value = cb_read_register(register);
+  u8 register_value = cb_read_register(regi);
 
   emulator_cycles(1);
 
   //if memory register HL is used -> needs more emulator cycles
-  if (register == REG_HL) {
+  if (regi == REG_HL) {
     emulator_cycles(2);
   }
 
   //new instructions 0x00-0x3F
   switch (new_instruction) {
     case 0: {
-      printf("RLC Instruction \n");
+      //printf("RLC Instruction \n");
       //RLC
       //rotate contents of register to the left and set C flag depending on bit
       bool c_flag = false;
@@ -1014,90 +1015,90 @@ static void type_cb(cpu_context *ctx) {
         c_flag = true;
       }
 
-      cb_set_register(register, new_value);
+      cb_set_register(regi, new_value);
       cpu_set_flags(new_value == 0, false, false, c_flag);
     } return;
 
     case 1: {
-      printf("RRC Instruction \n");
+      //printf("RRC Instruction \n");
       //RRC
       //rotate contents of register to the right and set flags accordingly
       u8 old_value = register_value;
       register_value >>= 1;
       register_value |= (old_value << 7);
       
-      cb_set_register(register, old_value);
+      cb_set_register(regi, old_value);
       cpu_set_flags(!old_value, false, false, old_value & 1);
       } return;
 
     case 2: {
-      printf("RL Instruction \n");
+      //printf("RL Instruction \n");
       //RL
       //rotate contents of register to the left and copy contents of C flag into register
       //set flags accordingly
       u8 old_value = register_value;
       register_value <<= 1;
-      register_value |= cpu_flag_C;
+      register_value |= (long) *cpu_flag_C;
       
-      cb_set_register(register, old_value);
+      cb_set_register(regi, old_value);
       cpu_set_flags(!old_value, false, false, (old_value & 0x80));
     } return;
 
     case 3: {
-      printf("RR Instruction \n");
+      //printf("RR Instruction \n");
       //RR
       //rotate contents of register to the right and copy contents of C flag into register
       u8 old_value = register_value;
       register_value >>= 1;
-      register_value |= (long)(cpu_flag_C << 7);
+      register_value |= ((long)(*cpu_flag_C) << 7);
       
-      cb_set_register(register, old_value);
+      cb_set_register(regi, old_value);
       cpu_set_flags(!old_value, false, false, old_value & 1);
     } return;
 
     case 4: {
-      printf("SLA Instruction \n");
+      //printf("SLA Instruction \n");
       //SLA
       //rotate contents of register to the left and set C flag accordingly
       u8 old_value = register_value;
       register_value <<= 1;
-      register_value |= (long)cpu_flag_C;
+      register_value |= (long) *cpu_flag_C;
       
-      cb_set_register(register, old_value);
+      cb_set_register(regi, old_value);
       cpu_set_flags(!old_value, false, false, (old_value & 0x80));
     } return;
 
     case 5: {
-      printf("SRA Instruction \n");
+      //printf("SRA Instruction \n");
       //SRA
       //rotate contents of register to the right and 
       //copy contents to C flag, bit 7 of register unchanged
       u8 old_value =  (int8_t)register_value >> 1;
      
-      cb_set_register(register, old_value);
+      cb_set_register(regi, old_value);
       cpu_set_flags(!old_value, false, false, old_value & 1);
     } return;
 
     case 6: {
-      printf("SWAP Instruction \n");
+      //printf("SWAP Instruction \n");
       //SWAP
       //swap the contents of the lower 4-bit into the higher 4-bits and vice versa
       u8 low = ((register_value & 0xF0) >> 4);
-      u8 high = ((register_value & 0xF0) << 4);
+      u8 high = ((register_value & 0xF) << 4);
       register_value = low | high;
 
-      cb_set_register(register, register_value);
+      cb_set_register(regi, register_value);
       cpu_set_flags(register_value == 0, false, false, false);
     } return;
 
     case 7: {
-      printf("SRL Instruction \n");
+      //printf("SRL Instruction \n");
       //SRL
       //rotate contents of register to the right and set 
       // and contents of bit 0 are copied to C flag
       u8 old_value =  register_value >> 1;
      
-      cb_set_register(register, old_value);
+      cb_set_register(regi, old_value);
       cpu_set_flags(!old_value, false, false, register_value & 1);
     } return;    
   }
@@ -1105,29 +1106,30 @@ static void type_cb(cpu_context *ctx) {
   //bit operations
   switch (bit_operations)
   {
-  case 1:
-    ("BIT Instruction \n");
+  case 1: {
+    //printf("BIT Instruction \n");
     //BIT
     //copy complement of bit 0 of register
     //change flags
-    u8 complement = !(register_value & (1 << bit));
+    u8 complement = !(register_value & (1 << bit_operations));
     cpu_set_flags(complement, false, true, -1);
     return;
+  }
 
   case 2:
-    ("RES Instruction \n");
+    //printf("RES Instruction \n");
     //RES
     //reset specified bit in register
     register_value &= ~(1 << bit_operations);
-    cb_set_register(register, register_value);
+    cb_set_register(regi, register_value);
     return;
 
   case 3:
-    ("SET Instruction \n");
+    //printf("SET Instruction \n");
     //SET
     //set specified bit in register
     register_value |= (1 << bit_operations);
-    cb_set_register(register, register_value);
+    cb_set_register(regi, register_value);
     return;
     
   default:
