@@ -40,7 +40,6 @@ typedef struct {
 
   
   //interrupts
-  bool ime;
   u8 interrupt_flag;
 } cpu_context;
 
