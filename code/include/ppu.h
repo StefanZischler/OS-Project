@@ -25,6 +25,7 @@ typedef struct {
 
 typedef struct {
   sprite oam[40];
+  u8 vram[0x2000];
 } ppu_context;
 
 
@@ -33,5 +34,8 @@ void ppu_tick();
 
 u8 ppu_oam_read(u16 address);
 void ppu_oam_write(u16 address, u8 value);
+
+u8 ppu_vram_read(u16 address);
+void ppu_vram_write(u16 address, u8 value);
 
 #endif

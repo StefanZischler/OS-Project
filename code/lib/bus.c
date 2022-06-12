@@ -27,8 +27,7 @@ u8 bus_read(u16 address) {
         return rom_read(address);
     } else if (address < 0xA000) {
         //Video RAM
-        //TODO: Implement ppu_read
-        return 0;
+        return ppu_vram_read(address);
     } else if (address < 0xC000) {
         //Cartridge RAM
         return rom_read(address);
@@ -40,7 +39,6 @@ u8 bus_read(u16 address) {
         return 0;
     } else if (address < 0xFEA0) {
         //Sprite attribute table (OAM)
-        //TODO: Implement oam_write
         return ppu_oam_read(address);
     } else if (address < 0xFF00) {
         //ECHO RAM (not usable)
@@ -65,8 +63,7 @@ void bus_write(u16 address, u8 value) {
         return rom_write(address, value);
     } else if (address < 0xA000) {
         //Video RAM
-        //TODO: Implement ppu_write
-        return;
+        return ppu_vram_write(address, value);
     } else if (address < 0xC000) {
         //Cartridge RAM
         return rom_write(address, value);
@@ -78,7 +75,6 @@ void bus_write(u16 address, u8 value) {
         return;
     } else if (address < 0xFEA0) {
         //Sprite attribute table (OAM)
-        //TODO: Implement oam_read
         ppu_oam_write(address, value);
         return;
     } else if (address < 0xFF00) {

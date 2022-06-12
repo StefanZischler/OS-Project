@@ -32,3 +32,11 @@ void ppu_oam_write(u16 address, u8 value) {
     pointer[address] = value;
   }
 }
+
+u8 ppu_vram_read(u16 address) {
+  return ctx.vram[address];
+}
+
+void ppu_vram_write(u16 address, u8 value) {
+  ctx.vram[address] = value;
+}
