@@ -2,14 +2,15 @@
 
 INCL = ../include/
 EMU = ../lib/emulator/
+REND = ../lib/rendering/
 PROC = ../lib/processor/
 MAIN = ../main/
 LIB = ../lib/
 
 all: gb_emulator
 
-gb_emulator: main.o emulator.o instruction_set.o interrupts.o cpu.o joypad.o io.o bus.o ram.o rom.o stack.o timer.o
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(PROC)cpu.o $(LIB)joypad.o $(LIB)io.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
+gb_emulator: main.o emulator.o instruction_set.o interrupts.o cpu.o joypad.o io.o ppu.o bus.o ram.o rom.o stack.o timer.o
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(PROC)cpu.o $(LIB)joypad.o $(LIB)io.o $(REND)ppu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
@@ -31,8 +32,11 @@ joypad.o: $(INCL)joypad.h $(INCL)define.h
 
 io.o: $(INCL)define.h 
 	gcc -o $(LIB)io.o -c $(LIB)io.c -I$(INCL)
+	
+ppu.o: $(INCL)ppu.h $(INCL)define.h
+	gcc -o $(REND)ppu.o -c $(REND)ppu.c -I$(INCL)
 
-bus.o: $(INCL)bus.h $(INCL)define.h $(INCL)ram.h $(INCL)cpu.h 
+bus.o: $(INCL)bus.h $(INCL)define.h $(INCL)ram.h $(INCL)cpu.h $(INCL)ppu.h
 	gcc -o $(LIB)bus.o -c $(LIB)bus.c -I$(INCL)
 
 ram.o: $(INCL)ram.h $(INCL)define.h

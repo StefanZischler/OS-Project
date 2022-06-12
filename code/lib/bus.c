@@ -2,6 +2,7 @@
 #include <rom.h>
 #include <ram.h>
 #include <cpu.h>
+#include <ppu.h>
 
 /* Memory Map for the GameBoy
 0000	3FFF	ROM Bank 0
@@ -40,7 +41,7 @@ u8 bus_read(u16 address) {
     } else if (address < 0xFEA0) {
         //Sprite attribute table (OAM)
         //TODO: Implement oam_write
-        return 0;
+        return ppu_oam_read(address);
     } else if (address < 0xFF00) {
         //ECHO RAM (not usable)
         return 0;
@@ -78,6 +79,7 @@ void bus_write(u16 address, u8 value) {
     } else if (address < 0xFEA0) {
         //Sprite attribute table (OAM)
         //TODO: Implement oam_read
+        ppu_oam_write(address, value);
         return;
     } else if (address < 0xFF00) {
         //ECHO RAM (not usable)
