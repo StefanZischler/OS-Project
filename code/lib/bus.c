@@ -3,6 +3,7 @@
 #include <ram.h>
 #include <cpu.h>
 #include <ppu.h>
+#include <io.h>
 
 /* Memory Map for the GameBoy
 0000	3FFF	ROM Bank 0
@@ -45,8 +46,7 @@ u8 bus_read(u16 address) {
         return 0;
     } else if (address < 0xFF80) {
         //I/O Registers
-        //TODO: Implement io_write
-        return 0;
+        return io_read(address);
     } else if (address < 0xFFFF) {
         //High RAM (HRAM)	
         return high_ram_read(address);
@@ -82,7 +82,7 @@ void bus_write(u16 address, u8 value) {
         return;
     } else if (address < 0xFF80) {
         //I/O Registers
-        //TODO: Implement io_read
+        io_write(address, value);
         return;
     } else if (address < 0xFFFF) {
         //High RAM (HRAM)	
