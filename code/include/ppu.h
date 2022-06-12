@@ -3,6 +3,13 @@
 
 #include <define.h>
 
+typedef enum {
+  MODE_HBLANK,
+  MODE_VBLANK,
+  MODE_OAM_SCAN,
+  MODE_DRAW_PIXELS
+} ppu_mode;
+
 typedef struct {
   u8 y_position;
   u8 x_position;

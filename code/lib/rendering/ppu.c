@@ -1,8 +1,14 @@
 #include <ppu.h>
+#include <lcd.h>
 
 //the pixel processing unit is responsible for sprite and tile data
 
 static ppu_context ctx;
+
+
+void ppu_init() {
+  lcd_init();
+}
 
 
 u8 ppu_oam_read(u16 address) {
