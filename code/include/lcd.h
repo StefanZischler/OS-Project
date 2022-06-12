@@ -18,12 +18,13 @@ typedef struct {
   u8 window_x;
 } lcd_context;
 
-#endif
-
-
 lcd_context* lcd_get_context();
 
 void lcd_init();
 
 u8 lcd_read(u16 address);
 void lcd_write(u16 address, u8 value);
+
+
+#endif
+

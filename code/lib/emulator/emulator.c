@@ -5,6 +5,7 @@
 #include <cpu.h>
 #include <rom.h>
 #include <timer.h>
+#include <dma.h>
 
 static emu_context ctx;
 
@@ -53,6 +54,6 @@ void emulator_cycles(int cpu_cycles_number) {
       timer_tick();
       //TODO: ppu
     }
-    //TODO: dma
+    dma_ticks();
   }
 }

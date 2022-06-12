@@ -74,7 +74,7 @@ Stack
  -> push/pop for 16 bit
 
 UI (User Interface)
- -> Use SDL? maybe OpenGL?
+ -> Use SDL
  -> initialize
  -> delay function
  -> get ticks
