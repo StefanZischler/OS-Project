@@ -10,7 +10,7 @@ lcd_context* lcd_get_context() {
 //gbdev.io/pandocs/Power_Up_Sequence.html#hardware-registers
 void lcd_init() {
   ctx.lcd_control = 0x91;
-  ctx.status_register = 0x81;	//TODO: which bootloader to use
+  ctx.status_register = 0x81;	//value not the same for every bootloader
   ctx.scroll_y = 0x00;
   ctx.scroll_x = 0x00;
   ctx.line_y = 0x91;

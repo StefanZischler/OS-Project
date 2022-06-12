@@ -1,6 +1,7 @@
 #include <io.h>
 #include <timer.h>
 #include <joypad.h>
+#include <lcd.h>
 
 
 // deal with i/o in the specific memory range
@@ -35,6 +36,7 @@ u8 io_read(u16 address) {
     //LCD Display Status
     if (0xFF40 <= address <= 0xFF4B) {
         // return lcd_status();
+        return lcd_read(address);
     }
     return 0;
 }
@@ -54,7 +56,7 @@ void io_write(u16 address, u8 value) {
     }
     //LCD Display Status
     if (0xFF40 <= address <= 0xFF4B) {
-        // lcd_write(address, value);
+        lcd_write(address, value);
         return;
     }
 }
