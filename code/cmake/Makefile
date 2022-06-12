@@ -9,8 +9,8 @@ LIB = ../lib/
 
 all: gb_emulator
 
-gb_emulator: main.o emulator.o instruction_set.o interrupts.o lcd.o cpu.o joypad.o io.o dma.o  ppu.o bus.o ram.o rom.o stack.o timer.o
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(REND)lcd.o $(PROC)cpu.o $(LIB)joypad.o $(LIB)io.o $(REND)dma.o $(REND)ppu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
+gb_emulator: main.o emulator.o instruction_set.o interrupts.o lcd.o cpu.o joypad.o io.o dma.o pixel_fetcher.o  ppu.o bus.o ram.o rom.o stack.o timer.o
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(REND)lcd.o $(PROC)cpu.o $(LIB)joypad.o $(LIB)io.o $(REND)dma.o $(REND)pixel_fetcher.o $(REND)ppu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
@@ -38,6 +38,9 @@ io.o: $(INCL)define.h
 
 dma.o: $(INCL)define.h 
 	gcc -o $(REND)dma.o -c $(REND)dma.c -I$(INCL)	
+	
+pixel_fetcher.o: $(INCL)pixel_fetcher.h $(INCL)define.h $(INCL)ppu.h
+	gcc -o $(REND)pixel_fetcher.o -c $(REND)pixel_fetcher.c -I$(INCL)
 	
 ppu.o: $(INCL)ppu.h $(INCL)lcd.h $(INCL)define.h
 	gcc -o $(REND)ppu.o -c $(REND)ppu.c -I$(INCL)
