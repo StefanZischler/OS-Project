@@ -9,12 +9,21 @@ typedef enum {
   FETCH_TILE,
   FETCH_DATA_LO,
   FETCH_DATA_HI,
-  FETCH_IDLE
+  FETCH_IDLE,
+  FETCH_PUSH
 } fetch_state;
 
 typedef struct {
   fetch_state state;
+  
+  //positions & coordinates
   u8 fetcher_x_position;
+  u8 tile_y_position;
+  
+  //tile data
+  u8 fetched_tile;
+  u8 fetch_data_lo;
+  u8 fetch_data_hi;
 } fifo_fetcher;
 
 typedef struct fifo_entry{
@@ -22,7 +31,7 @@ typedef struct fifo_entry{
   /*u8 color;	//value between 0 and 3
   u8 palette;	//value between 0 and 7
   bool background_priority;*/
-  u8 value	//contains color (bits 0,1), palette (bits 2,3,4) & priority (bit 5)
+  u32 value	//contains color for display
 } fifo_entry;
 
 typedef struct {
@@ -38,6 +47,8 @@ typedef struct {
   
   //track position of fifo
   u8 pushed_x_position;
+  u8 tilemap_x;
+  u8 tilemap_y;
   
   //the output as list of colors
   u32* video_buffer;
