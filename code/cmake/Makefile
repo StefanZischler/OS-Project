@@ -45,7 +45,7 @@ pixel_fetcher.o: $(INCL)pixel_fetcher.h $(INCL)define.h $(INCL)ppu.h
 ppu_modes.o: $(INCL)ppu_modes.h $(INCL)ppu.h $(INCL)lcd.h $(INCL)cpu.h $(INCL)interrupts.h $(INCL)define.h
 	gcc -o $(REND)ppu_modes.o -c $(REND)ppu_modes.c -I$(INCL)
 	
-ppu.o: $(INCL)ppu.h $(INCL)ppu_modes.h $(INCL)lcd.h $(INCL)define.h
+ppu.o: $(INCL)ppu.h $(INCL)ppu_modes.h $(INCL)pixel_fetcher.h $(INCL)lcd.h $(INCL)define.h
 	gcc -o $(REND)ppu.o -c $(REND)ppu.c -I$(INCL)
 
 bus.o: $(INCL)bus.h $(INCL)define.h $(INCL)ram.h $(INCL)cpu.h $(INCL)ppu.h $(INCL)dma.h

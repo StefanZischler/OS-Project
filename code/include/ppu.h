@@ -10,10 +10,30 @@ typedef struct {
   u8 sprite_attributes;
 } sprite;
 
+//linked list of sprite in one line
+typedef struct _sprite_line {
+  sprite entering;
+  struct _sprite_line *next;
+} sprite_line;
+
 typedef struct {
+  //OAM sprites
   sprite oam[40];
   u8 vram[0x2000];
+  //max of 10 sprites per line
+  u8 sprite_line_number;
+  //linked list of sprites
+  sprite_line *sprite_line;
+  //fixed memory size for sprites
+  sprite_line sprite_array[10];
+  //fetching sprites
+  u8 fetched_number_sprites;
+  sprite fetched_sprites[3];
+  //window information
+  u8 window_current_line;
+  //PPU Modes
   u8 mode;
+  u32 current_display;
   u32 ticks_on_line;
   u32 *display_buffer;
 } ppu_context;

@@ -31,7 +31,7 @@ typedef struct fifo_entry{
   /*u8 color;	//value between 0 and 3
   u8 palette;	//value between 0 and 7
   bool background_priority;*/
-  u32 value	//contains color for display
+  u32 value;	//contains color for display
 } fifo_entry;
 
 typedef struct {

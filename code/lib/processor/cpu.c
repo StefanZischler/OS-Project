@@ -427,10 +427,10 @@ PROCESSING
 
 //execute the current instruction -> for that get the instruction type
 static void execute() {
-  printf("Executing instruction: %02X  PC: %04X\n", ctx.current_opcode, ctx.registers.pc);
+  //printf("Executing instruction: %02X  PC: %04X\n", ctx.current_opcode, ctx.registers.pc);
+
   // get instruction type
-  
-  INS_TYPE type = instruction_get_type(ctx.current_instruction->type);
+    INS_TYPE type = instruction_get_type(ctx.current_instruction->type);
   // error message if this instruction type is yet not supported
   if(!type) {
     printf("Type not supported yet");
@@ -452,11 +452,11 @@ bool cpu_step () {
     fetch_instruction();
     emulator_cycles(1);
     fetch_instruction_data();
-
+    /* for debugging instructions
     printf("%04X:  (%02X %02X %02X) A: %02X B: %02X C: %02X\n",
       pc, ctx.current_opcode, bus_read(pc + 1), bus_read(pc + 2),
       ctx.registers.a, ctx.registers.b, ctx.registers.c);
-    
+    */
     if(ctx.current_instruction == NULL) {
       printf("Instruction %02X not implemented yet...\n", ctx.current_opcode);
       exit(-5);

@@ -1,5 +1,6 @@
 #include <ppu.h>
 #include <ppu_modes.h>
+#include <pixel_fetcher.h>
 #include <lcd.h>
 #include <string.h>
 
@@ -14,6 +15,22 @@ ppu_context *ppu_get_context() {
 
 void ppu_init() {
   
+  //PIXEL FIFO
+  fifo_get_context()->line_x = 0;
+  fifo_get_context()->pushed_x_position = 0;
+  fifo_get_context()->fetcher.state = FETCH_TILE;
+  fifo_get_context()->fetcher.fetcher_x_position= 0;
+  fifo_get_context()->fifo.size = 0;
+  fifo_get_context()->fifo.start = fifo_get_context()->fifo.end = NULL;
+ 
+  //OAM Sprites
+  ctx.sprite_line = 0;
+  ctx.fetched_number_sprites = 0;
+
+  //Window
+  ctx.window_current_line = 0;
+  //PPU MODES
+  ctx.current_display = 0;
   ctx.ticks_on_line = 0;
   ctx.display_buffer = malloc(X_RESOLUTION * Y_RESOLUTION * sizeof(32));
   lcd_init();

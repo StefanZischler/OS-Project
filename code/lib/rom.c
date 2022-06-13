@@ -139,7 +139,6 @@ void rom_write(u16 address, u8 value) {
 
 //load rom data
 bool rom_load(char *rom) {
-    //TODO: implement load function and display ROM information
     //print filename, size of rom
     snprintf(r_ctx.filename, sizeof(r_ctx.filename), "%s", rom);
 
@@ -172,8 +171,8 @@ bool rom_load(char *rom) {
     r_ctx.header = (rom_header *)(r_ctx.rom_data + 0x100);
     r_ctx.header->title[16] = 0;
 
-    //TODO: Making rom_type_name and rom_licence_name working correctly
-    //print basic informations about rom
+    /* for debugging cart load
+    print basic informations about rom
     printf("Rom Loaded:\n");
     printf("\t Title        : %s\n", r_ctx.header->title);
     printf("\t Type         : %2.2X (%s)\n", r_ctx.header->rom_type , rom_type_name());
@@ -181,6 +180,7 @@ bool rom_load(char *rom) {
     printf("\t ROM Version  : %2.2X\n", r_ctx.header->version_num);
     printf("\t ROM Size     : %d KB\n", 32 << r_ctx.header->rom_size);
     printf("\t RAM Size     : %2.2X\n", r_ctx.header->ram_size);
+    */
 
     //check if checksum passes
     //checksum needed to see if its a correct ROM
@@ -189,7 +189,7 @@ bool rom_load(char *rom) {
         checksum = checksum - r_ctx.rom_data[i] -1;
     }
 
-    printf("\t Checksum     : %2.2X (%s)\n", r_ctx.header->header_checksum, (checksum & 0xFF) ? "Correct Checksum" : "Failed Checksum");
+    // printf("\t Checksum     : %2.2X (%s)\n", r_ctx.header->header_checksum, (checksum & 0xFF) ? "Correct Checksum" : "Failed Checksum");
 
     return true;
 
