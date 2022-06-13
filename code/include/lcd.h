@@ -78,8 +78,8 @@ typedef enum {
 #define LCDS_STATUS_INTERRUPTS(interrupt) (lcd_get_context()->status_register & interrupt)
 
 //helper function to set bit for LYC
-#define SET_BIT (target, offset, bit) {if (bit) target |= (1 << offset); else target &= ~(1 << offset);}
-#define LCD_LYC (bit) (SET_BIT(lcd_get_context()->status_register, 2, bit))
+#define SET_BIT(target, offset, bit) {if (bit) target |= (1 << offset); else target &= ~(1 << offset);}
+#define LCD_LYC(bit) (SET_BIT(lcd_get_context()->status_register, 2, bit))
 
 
 void lcd_init();
