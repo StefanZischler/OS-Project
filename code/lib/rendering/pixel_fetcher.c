@@ -33,6 +33,18 @@ void fifo_push(u32 value) {
   ctx.fifo.size++;
 }
 
+u32 fifo_pop() {
+  if(ctx.fifo.size > 0) {
+    fifo_entry* entry = ctx.fifo.start;
+    u32 result = entry->value;
+    ctx.fifo.start = entry->next;
+    ctx.fifo.size--;
+    
+    free(entry);
+    return result;
+  }
+}
+
 bool fifo_add() {
   if(ctx.fifo.size > 8) {
     return false;
@@ -58,7 +70,6 @@ bool fifo_add() {
 }
 
 void fifo_fetch() {
-  //TODO: implement function
   switch(ctx.fetcher.state) {
     case FETCH_TILE:
       if(LDC_PRIORITY_BG_WINDOW) {
@@ -110,7 +121,17 @@ void fifo_fetch() {
 }
 
 void fifo_push_pixel() {
-  //TODO: implement function
+  if(ctx.fifo.size <= 8) {
+    //fifo may not go below 8 entries in queue
+    return;
+  }
+  
+  if(ctx.line_x >= lcd_get_context()->scroll_x % 8) {
+    ctx.video_buffer[ctx.pushed_x_position + lcd_get_context()->line_y * 160] = fifo_pop();
+    ctx.pushed_x_position++;
+  }
+  
+  ctx.line_x++;
 }
 
 void fifo_process() {
@@ -122,4 +143,11 @@ void fifo_process() {
   }
   
   fifo_push_pixel;
+}
+
+void fifo_reset() {
+  while(ctx.fifo.size > 0) {
+    fifo_pop();
+  }
+  ctx.fifo.start = 0;
 }

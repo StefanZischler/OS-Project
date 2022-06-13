@@ -47,6 +47,7 @@ typedef struct {
   
   //track position of fifo
   u8 pushed_x_position;
+  u8 line_x;
   u8 tilemap_x;
   u8 tilemap_y;
   
@@ -56,8 +57,7 @@ typedef struct {
 
 fifo_context* fifo_get_context();
 
-void fifo_fetch();
-
 void fifo_process();
+void fifo_reset();
 
 #endif
