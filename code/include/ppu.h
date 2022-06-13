@@ -17,19 +17,6 @@ typedef struct {
   u8 sprite_attributes;
 } sprite;
 
-typedef struct fifo_entry{
-  struct fifo_entry* next;
-  u8 color;	//value between 0 and 3
-  u8 palette;	//value between 0 and 7
-  bool background_priority;
-} fifo_entry;
-
-typedef struct {
-  fifo_entry* start;
-  fifo_entry* end;
-  u8 size;	//size between 0 and 16
-} fifo_queue;
-
 typedef struct {
   sprite oam[40];
   u8 vram[0x2000];
