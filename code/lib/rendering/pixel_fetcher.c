@@ -58,7 +58,14 @@ bool fifo_add() {
     
     u32 color = lcd_get_context()->background_colors[hilo];
     
-    //TODO: check cases
+    if(!LDC_WINDOW_ENABLE) {
+      //background is not enabled
+      color = lcd_get_context()->background_colors[0];
+    }
+    if(LDC_OBJ_ENABLE) {
+      //non-transparent pixels of sprites replace background pixels
+      //TODO: fetch sprite pixel
+    }
     
     //check if pixel is on screen
     //screen starts usually at x==8 but can be scrolled
@@ -67,6 +74,36 @@ bool fifo_add() {
     }
   }
   return true;
+}
+
+void fifo_load_window() {
+//temp variable for convenience
+    u8 y = lcd_get_context()->window_y;
+  //don't load window if it is not visible
+  //visibility depends on the window enable bit of the lcdc and the window position
+  if(!(LDC_WINDOW_ENABLE && y >= 0 && y <= 143 && lcd_get_context()->window_x >= 0 && lcd_get_context()->window_x <= 166)) {
+    return;
+  }
+  //WY condition
+  if(lcd_get_context()->line_y < y || lcd_get_context()->line_y >= y + 160) {
+    return;
+  }
+  //WX condition
+  if(ctx.fetcher.fetcher_x_position * 8 + 7 < lcd_get_context()->window_x || ctx.fetcher.fetcher_x_position * 8 + 7 >= lcd_get_context()->window_x + 143 + 14) {
+    return;
+  }
+  
+  //divide to get y position for tile index
+  u8 tile_y = lcd_get_context()->window_line / 8;
+  ctx.fetcher.fetched_tile = bus_read(LDC_TILE_MAP + 
+    ((ctx.fetcher.fetcher_x_position + 7 - lcd_get_context()->window_x) / 8) +
+    (tile_y * 32));
+    
+    if(LDC_BG_WINDOW_TILE == 0x8800) {
+      //in this address mode instead of 0x8000 + 0-255
+      //the address is 0x9000 + (-128)-127 
+      ctx.fetcher.fetched_tile += 128;
+    }
 }
 
 void fifo_fetch() {
@@ -81,10 +118,15 @@ void fifo_fetch() {
          (((lcd_get_context()->scroll_x / 8) + ctx.fetcher.fetcher_x_position) & 0x1F) +
          ((lcd_get_context()->line_y + lcd_get_context()->scroll_y) & 255));
          
-         //TODO: increment tile id?
+         if(LDC_BG_WINDOW_TILE == 0x8800) {
+           //in this address mode instead of 0x8000 + 0-255
+           //the address is 0x9000 + (-128)-127 
+           ctx.fetcher.fetched_tile += 128;
+         }
       }
       
       //TODO: get sprite data
+      fifo_load_window();
       
       ctx.fetcher.state = FETCH_DATA_LO;
       ctx.fetcher.fetcher_x_position++;

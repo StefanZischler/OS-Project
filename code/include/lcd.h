@@ -23,6 +23,7 @@ typedef struct {
   //window
   u8 window_y;
   u8 window_x;
+  u8 window_line;
   //pixel colors (4 grey tones)
   u32 background_colors[4];
   u32 sprite_1_color[4];
