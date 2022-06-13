@@ -64,6 +64,7 @@ bool fifo_add() {
     hilo |= ((ctx.fetcher.fetch_data_lo & (1 << (7 - i))) >> (7 - i)) << 1;
     
     
+    u32 color = lcd_get_context()->background_colors[hilo];
     if(!LDC_WINDOW_ENABLE) {
       //background is not enabled
       //color = lcd_get_context()->background_colors[0];
@@ -114,7 +115,7 @@ void fifo_load_window() {
 }
 
 u32 fifo_fetch_sprite_color(u8 background_color) {
-  u32 color = lcd_get_context()->background_colors[hilo];
+  u32 color = lcd_get_context()->background_colors[background_color];
   u8 previous_sprite_x = 167;
   //iterate over all (shown) sprites on the current line
   for(int i=0; i<ppu_get_context()->sprite_line_number; i++) {
@@ -162,7 +163,7 @@ u32 fifo_fetch_sprite_color(u8 background_color) {
 }
 
 //offset should be 0 for lo bits or 1 for hi bits
-fifo_load_sprites(u8 offset) {
+void fifo_load_sprites(u8 offset) {
   //sprites can be either 8 or 16 pixels high
   u8 sprite_height = LDC_OBJ_SIZE;
   
