@@ -1,13 +1,54 @@
 #include <ppu.h>
+#include <ppu_modes.h>
 #include <lcd.h>
+#include <string.h>
 
 //the pixel processing unit is responsible for sprite and tile data
 
 static ppu_context ctx;
 
 
+ppu_context *ppu_get_context() {
+    return &ctx;
+}
+
 void ppu_init() {
+  
+  ctx.ticks_on_line = 0;
+  ctx.display_buffer = malloc(X_RESOLUTION * Y_RESOLUTION * sizeof(32));
   lcd_init();
+  //set starting mode of PPU cycle
+  PPU_SET_MODE(MODE_OAM_SCAN);
+
+  //make memory space for OAM and Display 
+  memset(ctx.oam, 0, sizeof(ctx.oam));
+  memset(ctx.display_buffer, 0, X_RESOLUTION * Y_RESOLUTION * sizeof(u32));
+
+}
+
+
+//go trough one PPU cycles -> switch between modes
+void ppu_tick()  {
+  //increase ticks
+  ctx.ticks_on_line++;
+
+  //switch between modes 
+  switch (PPU_MODES)
+  {
+  case MODE_OAM_SCAN:
+    ppu_mode_oam();
+    break;
+  case MODE_DRAW_PIXELS:
+    ppu_mode_draw_pixels();
+    break;
+  case MODE_HBLANK:
+    ppu_mode_hblank();
+    break;
+  case MODE_VBLANK:
+    ppu_mode_vblank();
+    break;
+  }
+
 }
 
 
