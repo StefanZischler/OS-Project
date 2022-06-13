@@ -106,6 +106,34 @@ void fifo_load_window() {
     }
 }
 
+//offset should be 0 for lo bits or 1 for hi bits
+fifo_load_sprites(u8 offset) {
+  //sprites can be either 8 or 16 pixels high
+  u8 sprite_height = LDC_OBJ_SIZE;
+  
+  //iterate over all (shown) sprites on the current line
+  for(int i=0; i<ppu_get_context()->sprite_line_number; i++) {
+    //determine which line of the sprite must be loaded
+    //the sprite y-pos is 16 higher than the line count because sprites can
+    //go 16 pixels above the screen (so only part of the sprite is visible)
+    u8 tile_line = (lcd_get_context()->line_y + 16) - ppu_get_context()->sprite_array[i];
+    
+    //check if the sprite is flipped on the y-axis
+    if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 6)) {
+      tile_line = sprite_height - 1 - tile_line;
+    }
+    
+    //in 16x8 mode the least significant bit of the index is ignored
+    //see https://gbdev.io/pandocs/OAM.html#byte-2---tile-index
+    u8 tile_index = ppu_get_context()->sprite_array[i].tile_index;
+    if(sprite_height == 16) {
+      tile_index = tile_index & ~(1);
+    }
+    
+    ctx.fetcher.fetched_sprite_data[(i * 2) + offset] = bus_read(0x8000 + (tile_index * 16) + (tile_line * 2) + offset);
+  }
+}
+
 void fifo_fetch() {
   switch(ctx.fetcher.state) {
     case FETCH_TILE:
@@ -125,7 +153,8 @@ void fifo_fetch() {
          }
       }
       
-      //TODO: get sprite data
+      //if the window is visible on the current position, the window tile overwrites
+      //the background tile
       fifo_load_window();
       
       ctx.fetcher.state = FETCH_DATA_LO;
@@ -138,7 +167,8 @@ void fifo_fetch() {
         (ctx.fetcher.fetched_tile * 16) +
         ctx.fetcher.tile_y_position);
         
-        //TODO: load sprite data
+        //gets sprite information for lo
+        fifo_load_sprites(0);
       ctx.fetcher.state = FETCH_DATA_HI;
       break;
     case FETCH_DATA_HI:
@@ -147,7 +177,8 @@ void fifo_fetch() {
         (ctx.fetcher.fetched_tile * 16) +
         ctx.fetcher.tile_y_position + 1);
         
-        //TODO: load sprite data
+        //gets sprite information for hi
+        fifo_load_sprites(1);
       ctx.fetcher.state = FETCH_DATA_LO;
       break;
     case FETCH_IDLE:

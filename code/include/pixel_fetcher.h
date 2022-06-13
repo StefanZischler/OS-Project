@@ -24,6 +24,7 @@ typedef struct {
   u8 fetched_tile;
   u8 fetch_data_lo;
   u8 fetch_data_hi;
+  u8 fetched_sprite_data[20];	//lo/hi alternating
 } fifo_fetcher;
 
 typedef struct fifo_entry{
