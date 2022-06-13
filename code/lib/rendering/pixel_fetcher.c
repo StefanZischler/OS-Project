@@ -7,6 +7,11 @@
 *  the fifo fetches the data for which color needs to be shown for each pixel
 *  on the display.
 *  see https://gbdev.io/pandocs/pixel_fifo.html
+*
+*  the Gameboy has 2 fifo-queues - one for the background/window and one for the sprites
+*  the queues are always popped at the same time and one of the results is discarded
+*  this implementation combines the fifo-queues and only saves the pixel color
+*  that will be returned at pop()
 */
 
 static fifo_context ctx;
@@ -45,6 +50,8 @@ u32 fifo_pop() {
   }
 }
 
+u32 fifo_fetch_sprite_color(u8 background_color);
+
 bool fifo_add() {
   if(ctx.fifo.size > 8) {
     return false;
@@ -56,15 +63,15 @@ bool fifo_add() {
     u8 hilo = (ctx.fetcher.fetch_data_lo & (1 << (7 - i))) >> (7 - i);
     hilo |= ((ctx.fetcher.fetch_data_lo & (1 << (7 - i))) >> (7 - i)) << 1;
     
-    u32 color = lcd_get_context()->background_colors[hilo];
     
     if(!LDC_WINDOW_ENABLE) {
       //background is not enabled
-      color = lcd_get_context()->background_colors[0];
+      //color = lcd_get_context()->background_colors[0];
+      hilo = 0;
     }
     if(LDC_OBJ_ENABLE) {
       //non-transparent pixels of sprites replace background pixels
-      //TODO: fetch sprite pixel
+      color = fifo_fetch_sprite_color(hilo);
     }
     
     //check if pixel is on screen
@@ -104,6 +111,54 @@ void fifo_load_window() {
       //the address is 0x9000 + (-128)-127 
       ctx.fetcher.fetched_tile += 128;
     }
+}
+
+u32 fifo_fetch_sprite_color(u8 background_color) {
+  u32 color = lcd_get_context()->background_colors[hilo];
+  u8 previous_sprite_x = 167;
+  //iterate over all (shown) sprites on the current line
+  for(int i=0; i<ppu_get_context()->sprite_line_number; i++) {
+    //get position of sprite on screen
+    u8 sprite_x = ppu_get_context()->sprite_array[i].entering.x_position - 8 + (lcd_get_context()->scroll_x % 8);
+    
+    //check if sprite overlaps with fetcher position
+    if(sprite_x + 8 < ctx.fetcher.fetcher_x_position || sprite_x > ctx.fetcher.fetcher_x_position) {
+      continue;
+    }
+    
+    int offset = ctx.fetcher.fetcher_x_position - sprite_x;
+    if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 5)) {
+      //sprite is flipped on x-axis
+      offset = 7 - offset;
+    }
+    
+    //TODO: check if order is correct
+    u8 lo = (ctx.fetcher.fetched_sprite_data[i * 2] & (1 << (7 - offset))) >> (7 - offset);
+    u8 hi = ((ctx.fetcher.fetched_sprite_data[(i * 2) + 1] & (1 << (7 - offset))) >> (7 - offset)) << 1;
+    
+    //check if pixel is transparent
+    if(!(hi | lo)) {
+      continue;
+    }
+    
+    //check drawing priority
+    //sprite with lowest x-position has highest priority
+    if(sprite_x < previous_sprite_x) {
+      previous_sprite_x = sprite_x;
+      
+      bool bg_over_obj = ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 7);
+      if(background_color == 0 || !bg_over_obj) {
+        //determine the palette used
+        if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 4)) {
+          color = lcd_get_context()->sprite_2_color[hi | lo];
+        } else {
+          color = lcd_get_context()->sprite_1_color[hi | lo];
+        }
+      }
+    }
+  }
+  
+  return color;
 }
 
 //offset should be 0 for lo bits or 1 for hi bits
