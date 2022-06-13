@@ -116,7 +116,7 @@ fifo_load_sprites(u8 offset) {
     //determine which line of the sprite must be loaded
     //the sprite y-pos is 16 higher than the line count because sprites can
     //go 16 pixels above the screen (so only part of the sprite is visible)
-    u8 tile_line = (lcd_get_context()->line_y + 16) - ppu_get_context()->sprite_array[i];
+    u8 tile_line = (lcd_get_context()->line_y + 16) - ppu_get_context()->sprite_array[i].entering.y_position;
     
     //check if the sprite is flipped on the y-axis
     if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 6)) {
@@ -125,7 +125,7 @@ fifo_load_sprites(u8 offset) {
     
     //in 16x8 mode the least significant bit of the index is ignored
     //see https://gbdev.io/pandocs/OAM.html#byte-2---tile-index
-    u8 tile_index = ppu_get_context()->sprite_array[i].tile_index;
+    u8 tile_index = ppu_get_context()->sprite_array[i].entering.tile_index;
     if(sprite_height == 16) {
       tile_index = tile_index & ~(1);
     }
