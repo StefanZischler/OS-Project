@@ -91,7 +91,7 @@ void ppu_mode_oam(){
     fifo_get_context()->line_x = 0;
     fifo_get_context()->fetcher.state = FETCH_TILE;
     fifo_get_context()->fetcher.fetcher_x_position = 0;
-    fifo_get_context()->tick_count = 0;
+    fifo_get_context()->fifo_position = 0;
     
     //initialize sprite variables for next Mode
     //load sprites at the first OAM tick

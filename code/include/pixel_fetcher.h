@@ -44,13 +44,14 @@ typedef struct {
 typedef struct {
   fifo_queue fifo;
   fifo_fetcher fetcher;
-  int tick_count;
+  
   
   //track position of fifo
   u8 pushed_x_position;
   u8 line_x;
   u8 tilemap_x;
   u8 tilemap_y;
+  u8 fifo_position;
   
   //the output as list of colors
   u32* video_buffer;
