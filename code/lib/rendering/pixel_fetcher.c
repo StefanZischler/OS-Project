@@ -99,7 +99,7 @@ bool fifo_add() {
     
     
     u32 color = lcd_get_context()->background_colors[hilo];
-    if(!LDC_WINDOW_ENABLE) {
+    if(!LDC_PRIORITY_BG_WINDOW) {
       //background is not enabled
       //color = lcd_get_context()->background_colors[0];
       hilo = 0;
