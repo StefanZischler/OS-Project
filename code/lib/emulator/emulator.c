@@ -40,6 +40,7 @@ int emulator_run(int argc, char ** argv) {
   while (ctx.running) {
     if (ctx.paused) {
       sleep(10);
+      continue;
     }
     if (!cpu_step()) {
     printf("CPU stopped running!\n");

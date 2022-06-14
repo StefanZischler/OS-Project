@@ -19,7 +19,9 @@ SDL_Surface *SDL_surface;
 void render_game_windnow() {
     //intialize SDL video
     SDL_Init(SDL_INIT_VIDEO);
-    //TTF_Init();
+    printf("SDL Init\n");
+    TTF_Init();
+    printf("TTF Init\n");
     //initiate window and renderer
     SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, 0, &SDL_window, &SDL_renderer);
     //create surface (SDL_CreateRGBSurface(flag, width, height, depth, red mask, green, mask, blue mask, alpha mask))
@@ -28,10 +30,11 @@ void render_game_windnow() {
      //create texture
     SDL_texture = SDL_CreateTexture(SDL_renderer, SDL_PIXELFORMAT_ARGB8888,
      SDL_TEXTUREACCESS_STREAMING, WINDOW_WIDTH, WINDOW_HEIGHT);
-     //initialize window position
+     /*initialize window position
      int x_position, y_position;
      SDL_GetWindowPosition(SDL_window, &x_position, &y_position);
      SDL_SetWindowPosition(SDL_window, x_position, y_position);
+     */
 }
 
 //update window with infromation from PPU

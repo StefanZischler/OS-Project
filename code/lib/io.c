@@ -2,6 +2,7 @@
 #include <timer.h>
 #include <joypad.h>
 #include <lcd.h>
+#include <cpu.h>
 
 
 // deal with i/o in the specific memory range
@@ -33,11 +34,17 @@ u8 io_read(u16 address) {
     if (0xFF04 <= address <= 0xFF07) {
         return timer_read(address);
     }
+
+    //get interrupts flags
+    if (address == 0xFF0f) {
+        return cpu_get_ie_register();
+    }
     //LCD Display Status
     if (0xFF40 <= address <= 0xFF4B) {
         // return lcd_status();
         return lcd_read(address);
     }
+    printf("Unsupported io_read(%04X)\n", address);
     return 0;
 }
 
@@ -54,9 +61,15 @@ void io_write(u16 address, u8 value) {
         timer_write(address, value);
         return; 
     }
+    //set interrupt flag
+    if (address == 0xFF0F) {
+        cpu_set_ie_register(value);
+        return;
+    }
     //LCD Display Status
     if (0xFF40 <= address <= 0xFF4B) {
         lcd_write(address, value);
         return;
     }
+    printf("Unsupported io_write(%04X)\n", address);
 }

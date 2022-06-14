@@ -78,7 +78,6 @@ void bus_write(u16 address, u8 value) {
         return work_ram_write(address, value);
     } else if (address < 0xFE00) {
         //ECHO RAM (not usable)
-        return;
     } else if (address < 0xFEA0) {
         //Sprite attribute table (OAM)
         if(is_dma_transferring()) {
@@ -87,7 +86,6 @@ void bus_write(u16 address, u8 value) {
         ppu_oam_write(address, value);
     } else if (address < 0xFF00) {
         //ECHO RAM (not usable)
-        return;
     } else if (address < 0xFF80) {
         //I/O Registers
         io_write(address, value);

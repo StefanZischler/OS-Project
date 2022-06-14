@@ -16,8 +16,6 @@ bool window_visible() {
 }
 //work with LY (current line in LCD) and update window
 void ly_next_line() {
-    //incriment LY
-    lcd_get_context()->line_y++;
 
     //update window line if window visible
     if(window_visible() && lcd_get_context()->line_y >= lcd_get_context()->window_y
@@ -25,6 +23,9 @@ void ly_next_line() {
         ppu_get_context()->window_current_line++;
     }
 
+    //incriment LY
+    lcd_get_context()->line_y++;
+    
     //if LY = LY_COMPARE set LYC FLAG
     if (lcd_get_context()->line_y == lcd_get_context()->line_y_compare) {
         LCD_LYC(1);
