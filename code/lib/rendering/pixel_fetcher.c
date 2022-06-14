@@ -24,18 +24,18 @@ fifo_context* fifo_get_context() {
 }
 
 void fifo_push(u32 value) {
-  fifo_entry entry = { 
-    .next = 0,
-    .value = value};
+  fifo_entry *entry = malloc(sizeof(fifo_entry));
+  entry->next = NULL;
+  entry->value = value;
   
   if(!ctx.fifo.start) {
     //if the fifo is empty
-    ctx.fifo.start = &entry;
-    ctx.fifo.end = &entry;
+    ctx.fifo.start = entry;
+    ctx.fifo.end = entry;
   } else {
     //insert the entry at end of queue
-    ctx.fifo.end->next = &entry;
-    ctx.fifo.end = &entry;
+    ctx.fifo.end->next = entry;
+    ctx.fifo.end = entry;
   }
   
   ctx.fifo.size++;
@@ -44,11 +44,10 @@ void fifo_push(u32 value) {
 u32 fifo_pop() {
   if(ctx.fifo.size > 0) {
     fifo_entry* entry = ctx.fifo.start;
-    u32 result = entry->value;
     ctx.fifo.start = entry->next;
     ctx.fifo.size--;
-    
-    //free(entry);
+    u32 result = entry->value;
+    free(entry);
     printf("pop %u\n", result);
     printf("size: %u\n", ctx.fifo.size);
     return result;

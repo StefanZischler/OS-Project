@@ -27,8 +27,8 @@ typedef struct {
   u8 fetched_sprite_data[20];	//lo/hi alternating
 } fifo_fetcher;
 
-typedef struct fifo_entry{
-  struct fifo_entry* next;
+typedef struct _fifo_entry{
+  struct _fifo_entry* next;
   /*u8 color;	//value between 0 and 3
   u8 palette;	//value between 0 and 7
   bool background_priority;*/
