@@ -34,8 +34,9 @@ void dma_ticks() {
     }
 
     //test if delay reached Zero
-    if (dma.delay_on_start != 0) {
+    if (dma.delay_on_start) {
         dma.delay_on_start--;
+        return;
     }
 
     //if thats the case start OAM write

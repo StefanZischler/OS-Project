@@ -71,6 +71,24 @@ void ly_load_sprites(){
                 spt_line->next = ppu_get_context()->sprite_line;
                 ppu_get_context()->sprite_line = spt_line;
             }
+            //sort the sprite line (sometimes necessary)
+            sprite_line *sl = ppu_get_context()->sprite_line;
+            sprite_line *prev_sl = sl;
+
+            //go trough sprite line and sort array
+            while(sl) {
+                if(sl->entering.x_position > spt.x_position) {
+                    prev_sl->next = spt_line;
+                    spt_line->next = sl;
+                    break;
+                }
+                if(!sl->next) {
+                    sl->next = spt_line;
+                    break;
+                }
+                prev_sl = sl;
+                sl = sl->next;
+            }
         }
 
 

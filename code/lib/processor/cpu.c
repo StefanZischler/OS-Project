@@ -470,10 +470,13 @@ bool cpu_step () {
   } else {
     //CPU is halted
     emulator_cycles(1);
-    ctx.halted = false;
+    if(ctx.interrupt_flag) {
+      ctx.halted = false;
+    }
   }
-  
-  cpu_handle_interrupts(&ctx);
+  if (ctx.interrupt_master_enabled_flag) {
+    cpu_handle_interrupts(&ctx);
+  }
 
   return true;
 }
