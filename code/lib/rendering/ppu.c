@@ -33,6 +33,7 @@ void ppu_init() {
   //PPU MODES
   ctx.current_display = 0;
   ctx.ticks_on_line = 0;
+  printf("allocated %d", X_RESOLUTION * Y_RESOLUTION);
   ctx.display_buffer = malloc(X_RESOLUTION * Y_RESOLUTION * sizeof(32));
   lcd_init();
   //set starting mode of PPU cycle

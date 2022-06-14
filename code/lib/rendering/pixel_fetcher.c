@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <pixel_fetcher.h>
 #include <ppu.h>
 #include <lcd.h>
@@ -29,6 +31,7 @@ void fifo_push(u32 value) {
   if(!ctx.fifo.start) {
     //if the fifo is empty
     ctx.fifo.start = &entry;
+    ctx.fifo.end = &entry;
   } else {
     //insert the entry at end of queue
     ctx.fifo.end->next = &entry;
@@ -45,7 +48,9 @@ u32 fifo_pop() {
     ctx.fifo.start = entry->next;
     ctx.fifo.size--;
     
-    free(entry);
+    //free(entry);
+    printf("pop %u\n", result);
+    printf("size: %u\n", ctx.fifo.size);
     return result;
   }
 }
@@ -78,6 +83,7 @@ bool fifo_add() {
     //check if pixel is on screen
     //screen starts usually at x==8 but can be scrolled
     if((ctx.fetcher.fetcher_x_position * 8) - (8 - (lcd_get_context()->scroll_x % 8))) {
+      printf(" fifo_push %u\n", color);
       fifo_push(color);
     }
   }
@@ -235,7 +241,7 @@ void fifo_fetch() {
         
         //gets sprite information for hi
         fifo_load_sprites(1);
-      ctx.fetcher.state = FETCH_DATA_LO;
+      ctx.fetcher.state = FETCH_IDLE;
       break;
     case FETCH_IDLE:
       ctx.fetcher.state = FETCH_PUSH;
@@ -252,12 +258,17 @@ void fifo_fetch() {
 void fifo_push_pixel() {
   if(ctx.fifo.size <= 8) {
     //fifo may not go below 8 entries in queue
+    printf("size: %d\n", ctx.fifo.size);
     return;
   }
   
+  printf("push pixel\n");
   if(ctx.line_x >= lcd_get_context()->scroll_x % 8) {
-    ctx.video_buffer[ctx.pushed_x_position + lcd_get_context()->line_y * 160] = fifo_pop();
+    printf("Test %d\n", ctx.pushed_x_position + lcd_get_context()->line_y * 160);
+    ppu_get_context()->display_buffer[ctx.pushed_x_position + lcd_get_context()->line_y * 160] = fifo_pop();
+    printf("Test 2\n");
     ctx.pushed_x_position++;
+    printf("TEST: pushed pixel %d\n", ctx.pushed_x_position + lcd_get_context()->line_y * 160);
   }
   
   ctx.line_x++;
@@ -271,7 +282,7 @@ void fifo_process() {
     fifo_fetch();
   }
   
-  fifo_push_pixel;
+  fifo_push_pixel();
 }
 
 void fifo_reset() {
