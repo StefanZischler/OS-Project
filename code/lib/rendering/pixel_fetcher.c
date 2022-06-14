@@ -84,6 +84,7 @@ bool fifo_add() {
     if((ctx.fetcher.fetcher_x_position * 8) - (8 - (lcd_get_context()->scroll_x % 8))) {
       printf(" fifo_push %u\n", color);
       fifo_push(color);
+      ctx.fifo_position++;
     }
   }
   return true;
@@ -128,11 +129,12 @@ u32 fifo_fetch_sprite_color(u8 background_color) {
     u8 sprite_x = ppu_get_context()->sprite_array[i].entering.x_position - 8 + (lcd_get_context()->scroll_x % 8);
     
     //check if sprite overlaps with fetcher position
-    if(sprite_x + 8 < ctx.fetcher.fetcher_x_position || sprite_x > ctx.fetcher.fetcher_x_position) {
+    if(sprite_x + 8 < ctx.fifo_position || sprite_x > ctx.fifo_position) {
       continue;
     }
     
-    int offset = ctx.fetcher.fetcher_x_position - sprite_x;
+    
+    int offset = ctx.fifo_position - sprite_x;
     if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 5)) {
       //sprite is flipped on x-axis
       offset = 7 - offset;
@@ -274,10 +276,11 @@ void fifo_push_pixel() {
 }
 
 void fifo_process() {
-  ctx.tick_count++;
-  
-  
-  if(ctx.tick_count & 1) {
+  ctx.fetcher.tile_y_position = ((lcd_get_context()->line_y + lcd_get_context()->scroll_y) % 8) *2;
+  ctx.tilemap_x = (ctx.fetcher.fetcher_x_position + lcd_get_context()->scroll_x);
+  ctx.tilemap_y = (lcd_get_context()->line_y + lcd_get_context()->scroll_y);
+
+  if(!(ppu_get_context()->ticks_on_line & 1)) {
     fifo_fetch();
   }
   
