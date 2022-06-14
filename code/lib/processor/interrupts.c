@@ -8,7 +8,8 @@ void interrupt_handle(cpu_context *ctx, interrupt_type type, u16 address);
 
 //requests an interrupt by setting the corresponding interrupt flag
 void cpu_request_interrupt(cpu_context *ctx, interrupt_type type) {
-  ctx->interrupt_flag = ctx->interrupt_flag | type;
+  printf("Interrupt request %d\n", type);
+  cpu_get_context()->interrupt_flag = cpu_get_context()->interrupt_flag | type;
 }
 
 //handles requested interrupts if they are enabled
