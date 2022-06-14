@@ -124,9 +124,9 @@ u32 fifo_fetch_sprite_color(u8 background_color) {
   u32 color = lcd_get_context()->background_colors[background_color];
   u8 previous_sprite_x = 167;
   //iterate over all (shown) sprites on the current line
-  for(int i=0; i<ppu_get_context()->sprite_line_number; i++) {
+  for(int i=0; i<ppu_get_context()->fetched_number_sprites; i++) {
     //get position of sprite on screen
-    u8 sprite_x = ppu_get_context()->sprite_array[i].entering.x_position - 8 + (lcd_get_context()->scroll_x % 8);
+    u8 sprite_x = ppu_get_context()->fetched_sprites[i].x_position - 8 + (lcd_get_context()->scroll_x % 8);
     
     //check if sprite overlaps with fetcher position
     if(sprite_x + 8 < ctx.fifo_position || sprite_x > ctx.fifo_position) {
@@ -135,7 +135,7 @@ u32 fifo_fetch_sprite_color(u8 background_color) {
     
     
     int offset = ctx.fifo_position - sprite_x;
-    if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 5)) {
+    if(ppu_get_context()->fetched_sprites[i].sprite_attributes & (1 << 5)) {
       //sprite is flipped on x-axis
       offset = 7 - offset;
     }
@@ -154,10 +154,10 @@ u32 fifo_fetch_sprite_color(u8 background_color) {
     if(sprite_x < previous_sprite_x) {
       previous_sprite_x = sprite_x;
       
-      bool bg_over_obj = ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 7);
+      bool bg_over_obj = ppu_get_context()->fetched_sprites[i].sprite_attributes & (1 << 7);
       if(background_color == 0 || !bg_over_obj) {
         //determine the palette used
-        if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 4)) {
+        if(ppu_get_context()->fetched_sprites[i].sprite_attributes & (1 << 4)) {
           color = lcd_get_context()->sprite_2_color[hi | lo];
         } else {
           color = lcd_get_context()->sprite_1_color[hi | lo];
@@ -175,20 +175,20 @@ void fifo_load_sprites(u8 offset) {
   u8 sprite_height = LDC_OBJ_SIZE;
   
   //iterate over all (shown) sprites on the current line
-  for(int i=0; i<ppu_get_context()->sprite_line_number; i++) {
+  for(int i=0; i<ppu_get_context()->fetched_number_sprites; i++) {
     //determine which line of the sprite must be loaded
     //the sprite y-pos is 16 higher than the line count because sprites can
     //go 16 pixels above the screen (so only part of the sprite is visible)
-    u8 tile_line = (lcd_get_context()->line_y + 16) - ppu_get_context()->sprite_array[i].entering.y_position;
+    u8 tile_line = (lcd_get_context()->line_y + 16) - ppu_get_context()->fetched_sprites[i].y_position;
     
     //check if the sprite is flipped on the y-axis
-    if(ppu_get_context()->sprite_array[i].entering.sprite_attributes & (1 << 6)) {
+    if(ppu_get_context()->fetched_sprites[i].sprite_attributes & (1 << 6)) {
       tile_line = sprite_height - 1 - tile_line;
     }
     
     //in 16x8 mode the least significant bit of the index is ignored
     //see https://gbdev.io/pandocs/OAM.html#byte-2---tile-index
-    u8 tile_index = ppu_get_context()->sprite_array[i].entering.tile_index;
+    u8 tile_index = ppu_get_context()->fetched_sprites[i].tile_index;
     if(sprite_height == 16) {
       tile_index = tile_index & ~(1);
     }
@@ -202,7 +202,7 @@ void fifo_fetch() {
     case FETCH_TILE:
       if(LDC_PRIORITY_BG_WINDOW) {
         //is background enabled
-        
+        ppu_get_context()->fetched_number_sprites = 0;
         //get the background tile
         //address calculation from https://gbdev.io/pandocs/pixel_fifo.html#get-tile
         ctx.fetcher.fetched_tile = bus_read(LDC_BG_WINDOW_TILE +
