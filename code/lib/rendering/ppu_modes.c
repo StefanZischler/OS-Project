@@ -8,6 +8,7 @@
 
 extern cpu_context *ctx;
 
+
 //return if window is visible
 bool window_visible() {
     return LDC_WINDOW_ENABLE && lcd_get_context()->window_x >= 0 && 
@@ -25,7 +26,7 @@ void ly_next_line() {
 
     //incriment LY
     lcd_get_context()->line_y++;
-    
+
     //if LY = LY_COMPARE set LYC FLAG
     if (lcd_get_context()->line_y == lcd_get_context()->line_y_compare) {
         LCD_LYC(1);

@@ -37,6 +37,8 @@ void cpu_init() {
   //printf("C-flag: %d\n", cpu_flag_C());
 
   ctx.interrupt_master_enabled_flag = false;
+  ctx.ie_register = 0;
+  ctx.interrupt_flag = 0;
   
 }
 
@@ -427,7 +429,7 @@ PROCESSING
 
 //execute the current instruction -> for that get the instruction type
 static void execute() {
-  //printf("Executing instruction: %02X  PC: %04X\n", ctx.current_opcode, ctx.registers.pc);
+  printf("Executing instruction: %02X  PC: %04X\n", ctx.current_opcode, ctx.registers.pc);
 
   // get instruction type
     INS_TYPE type = instruction_get_type(ctx.current_instruction->type);
@@ -452,11 +454,11 @@ bool cpu_step () {
     fetch_instruction();
     emulator_cycles(1);
     fetch_instruction_data();
-    /* for debugging instructions
+    // for debugging instructions
     printf("%04X:  (%02X %02X %02X) A: %02X B: %02X C: %02X\n",
       pc, ctx.current_opcode, bus_read(pc + 1), bus_read(pc + 2),
       ctx.registers.a, ctx.registers.b, ctx.registers.c);
-    */
+    
     if(ctx.current_instruction == NULL) {
       printf("Instruction %02X not implemented yet...\n", ctx.current_opcode);
       exit(-5);

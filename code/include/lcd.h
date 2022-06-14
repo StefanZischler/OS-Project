@@ -32,7 +32,6 @@ typedef struct {
 
 lcd_context* lcd_get_context();
 
-
 /* 
 FF40 LCD Control (LDLC) https://gbdev.io/pandocs/LCDC.html
 7	LCD and PPU enable	0=Off, 1=On

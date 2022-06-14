@@ -3,6 +3,7 @@
 #include <pixel_fetcher.h>
 #include <lcd.h>
 #include <string.h>
+#include <stdint.h>
 
 //the pixel processing unit is responsible for sprite and tile data
 
@@ -36,7 +37,8 @@ void ppu_init() {
   lcd_init();
   //set starting mode of PPU cycle
   PPU_SET_MODE(MODE_OAM_SCAN);
-
+  
+  
   //make memory space for OAM and Display 
   memset(ctx.oam, 0, sizeof(ctx.oam));
   memset(ctx.display_buffer, 0, X_RESOLUTION * Y_RESOLUTION * sizeof(u32));

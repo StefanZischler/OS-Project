@@ -2,6 +2,7 @@
 #define GAME_WINDOW_H
 
 #include <define.h>
+#include <stdint.h>
 
 //set window size
 static const int WINDOW_WIDTH =  640;
