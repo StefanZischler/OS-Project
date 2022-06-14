@@ -29,6 +29,7 @@ void joypad_select_mode(u8 value) {
 //get joypad output
 u8 joypad_output() {
     //define ooutput variable
+    //at start everything set -> which means not pressed
     u8 jp_output = 0xCF;
 
     //if buttons mode

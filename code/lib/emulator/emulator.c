@@ -6,6 +6,8 @@
 #include <rom.h>
 #include <timer.h>
 #include <dma.h>
+#include <ppu.h>
+#include <game_window.h>
 
 static emu_context ctx;
 
@@ -26,6 +28,8 @@ int emulator_run(int argc, char ** argv) {
   
   printf("Cart loaded correctly!\n");
 
+  //intialize game window
+  render_game_windnow();
   //initialize CPU
   cpu_init();
   ctx.running = true;
@@ -42,6 +46,17 @@ int emulator_run(int argc, char ** argv) {
     return -1;
     }
   }
+
+  //update window
+  u32 previous_display = 0;
+  while(!ctx.exit) {
+    usleep(1000);
+    handel_events();
+    if (previous_display != ppu_get_context()->current_display) {
+      update_window();
+    }
+    previous_display = ppu_get_context()->current_display;
+  }
   
   return 0;
 }
@@ -52,7 +67,7 @@ void emulator_cycles(int cpu_cycles_number) {
     for(int j=0; j<4; j++) {
       ctx.ticks++;
       timer_tick();
-      //TODO: ppu
+      ppu_tick();
     }
     dma_ticks();
   }

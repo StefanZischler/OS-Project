@@ -1,4 +1,5 @@
 #include <ppu_modes.h>
+#include <pixel_fetcher.h>
 #include <ppu.h>
 #include <lcd.h>
 #include <cpu.h>
@@ -7,6 +8,7 @@
 
 extern cpu_context *ctx;
 
+//return if window is visible
 bool window_visible() {
     return LDC_WINDOW_ENABLE && lcd_get_context()->window_x >= 0 && 
     lcd_get_context()->window_x <= 166 && lcd_get_context()->window_y >= 0 && 
@@ -17,7 +19,7 @@ void ly_next_line() {
     //incriment LY
     lcd_get_context()->line_y++;
 
-    //update window line
+    //update window line if window visible
     if(window_visible() && lcd_get_context()->line_y >= lcd_get_context()->window_y
     && lcd_get_context()->line_y < lcd_get_context()->window_y + Y_RESOLUTION) {
         ppu_get_context()->window_current_line++;
@@ -142,6 +144,7 @@ void ppu_mode_vblank(){
             PPU_SET_MODE(MODE_OAM_SCAN);
             //reset ly
             lcd_get_context()->line_y = 0;
+            ppu_get_context()->window_current_line = 0;
         }
         ppu_get_context()->ticks_on_line = 0;
     }

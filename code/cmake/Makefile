@@ -7,15 +7,19 @@ PROC = ../lib/processor/
 MAIN = ../main/
 LIB = ../lib/
 
+#/usr/lib/x86_64-linux-gnu/cmake/SDL2
+SDL_CFLAGS := $(shell sdl2-config --cflags)
+SDL_LDFLAGS := $(shell sdl2-config --libs) -lSDL2_ttf
+
 all: gb_emulator
 
-gb_emulator: main.o emulator.o instruction_set.o interrupts.o lcd.o cpu.o joypad.o io.o dma.o pixel_fetcher.o  ppu_modes.o ppu.o bus.o ram.o rom.o stack.o timer.o
-	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(REND)lcd.o $(PROC)cpu.o $(LIB)joypad.o $(LIB)io.o $(REND)dma.o $(REND)pixel_fetcher.o $(REND)ppu_modes.o $(REND)ppu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o
+gb_emulator: main.o emulator.o instruction_set.o interrupts.o lcd.o cpu.o joypad.o io.o dma.o game_window.o pixel_fetcher.o  ppu_modes.o ppu.o bus.o ram.o rom.o stack.o timer.o
+	gcc -o GB-Emulator $(MAIN)main.o $(EMU)emulator.o $(PROC)instruction_set.o $(PROC)interrupts.o $(REND)lcd.o $(PROC)cpu.o $(LIB)joypad.o $(LIB)io.o $(REND)dma.o $(REND)game_window.o $(SDL_CFLAGS) $(SDL_LDFLAGS) $(REND)pixel_fetcher.o $(REND)ppu_modes.o $(REND)ppu.o $(LIB)bus.o $(LIB)ram.o $(LIB)rom.o $(LIB)stack.o $(LIB)timer.o 
 
 main.o: $(MAIN)main.c $(INCL)emulator.h $(INCL)cpu.h
 	gcc -o $(MAIN)main.o -c $(MAIN)main.c -I$(INCL)
 
-emulator.o: $(INCL)cpu.h $(INCL)rom.h $(INCL)emulator.h $(INCL)timer.h $(INCL)dma.h
+emulator.o: $(INCL)cpu.h $(INCL)rom.h $(INCL)emulator.h $(INCL)timer.h $(INCL)dma.h $(INCL)game_window.h $(INCL)ppu.h
 	gcc -o $(EMU)emulator.o -c $(EMU)emulator.c -I$(INCL)
 
 instruction_set.o: $(INCL)instruction_set.h $(INCL)cpu.h $(INCL)bus.h $(INCL)define.h
@@ -38,11 +42,14 @@ io.o: $(INCL)define.h
 
 dma.o: $(INCL)define.h 
 	gcc -o $(REND)dma.o -c $(REND)dma.c -I$(INCL)	
+
+game_window.o: $(INCL)game_window.h $(INCL)joypad.h $(INCL)emulator.h $(INCL)bus.h $(INCL)ppu.h  $(INCL)define.h 
+	gcc -o $(REND)game_window.o $(SDL_CFLAGS) $(SDL_LDFLAGS) -c $(REND)game_window.c -I$(INCL) 
 	
 pixel_fetcher.o: $(INCL)pixel_fetcher.h $(INCL)define.h $(INCL)ppu.h
 	gcc -o $(REND)pixel_fetcher.o -c $(REND)pixel_fetcher.c -I$(INCL)
 
-ppu_modes.o: $(INCL)ppu_modes.h $(INCL)ppu.h $(INCL)lcd.h $(INCL)cpu.h $(INCL)interrupts.h $(INCL)define.h
+ppu_modes.o: $(INCL)ppu_modes.h $(INCL)pixel_fetcher.h $(INCL)ppu.h $(INCL)lcd.h $(INCL)cpu.h $(INCL)interrupts.h $(INCL)define.h
 	gcc -o $(REND)ppu_modes.o -c $(REND)ppu_modes.c -I$(INCL)
 	
 ppu.o: $(INCL)ppu.h $(INCL)ppu_modes.h $(INCL)pixel_fetcher.h $(INCL)lcd.h $(INCL)define.h
