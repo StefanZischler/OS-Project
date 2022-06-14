@@ -102,7 +102,7 @@ void fifo_load_window() {
   }
   
   //divide to get y position for tile index
-  u8 tile_y = lcd_get_context()->window_line / 8;
+  u8 tile_y = ppu_get_context()->window_current_line / 8;
   ctx.fetcher.fetched_tile = bus_read(LDC_TILE_MAP + 
     ((ctx.fetcher.fetcher_x_position + 7 - lcd_get_context()->window_x) / 8) +
     (tile_y * 32));
