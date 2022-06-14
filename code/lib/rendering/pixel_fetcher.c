@@ -55,6 +55,36 @@ u32 fifo_pop() {
 }
 
 u32 fifo_fetch_sprite_color(u8 background_color);
+//return if window is visible
+bool window_visible_fetcher() {
+    return LDC_WINDOW_ENABLE && lcd_get_context()->window_x >= 0 && 
+    lcd_get_context()->window_x <= 166 && lcd_get_context()->window_y >= 0 && 
+    lcd_get_context()->window_y <= Y_RESOLUTION; 
+}
+
+//load sprite tile 
+void fifo_load_sprite_tile() {
+  //load sprite array
+  sprite_line *sl = ppu_get_context()->sprite_line;
+  //loop through sprite array 
+  while(sl) {
+    //get next sprite
+    int sprite_x = (sl->entering.x_position - 8) + (lcd_get_context()->scroll_x % 8);
+    //test if sprite is right size for data processing
+    if ((sprite_x >= ctx.fetcher.fetcher_x_position && sprite_x < ctx.fetcher.fetcher_x_position + 8) ||
+    ((sprite_x + 8) >= ctx.fetcher.fetcher_x_position && (sprite_x + 8) < ctx.fetcher.fetcher_x_position + 8)) {
+      //add new sprite to fetched sprites array
+      ppu_get_context()->fetched_sprites[ppu_get_context()->fetched_number_sprites++];
+    }
+    //go to next sprite
+    sl = sl->next;
+    //test if sprite exceeded array size of 3
+    if(!sl || ppu_get_context()->fetched_number_sprites >= 3) {
+      break;
+    }
+  }
+  
+}
 
 bool fifo_add() {
   if(ctx.fifo.size > 8) {
@@ -91,6 +121,9 @@ bool fifo_add() {
 }
 
 void fifo_load_window() {
+  if (!window_visible_fetcher()) {
+    return;
+  }
 //temp variable for convenience
     u8 y = lcd_get_context()->window_y;
   //don't load window if it is not visible
@@ -214,11 +247,16 @@ void fifo_fetch() {
            //the address is 0x9000 + (-128)-127 
            ctx.fetcher.fetched_tile += 128;
          }
+         //if the window is visible on the current position, the window tile overwrites
+        //the background tile
+        fifo_load_window();
+
       }
-      
-      //if the window is visible on the current position, the window tile overwrites
-      //the background tile
-      fifo_load_window();
+
+      //load sprite tiles
+      if (LDC_OBJ_ENABLE && ppu_get_context()->sprite_line) {
+        fifo_load_sprite_tile();
+      }  
       
       ctx.fetcher.state = FETCH_DATA_LO;
       ctx.fetcher.fetcher_x_position++;
