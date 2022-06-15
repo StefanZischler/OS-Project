@@ -54,7 +54,6 @@ void interrupt_handle(cpu_context *ctx, interrupt_type type, u16 address) {
   
   ctx->halted = false;
   
-  //TODO: execute 2 wait cycles
   //set the program counter to address of the handler
   stack_push16(ctx->registers.pc);
   ctx->registers.pc = address;
