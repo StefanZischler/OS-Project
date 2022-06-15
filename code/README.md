@@ -10,4 +10,10 @@ Do run the emulator you first have to install a few things:
 - SDL2: sudo apt-get install libsdl2-2.0 -> game window
         sudo apt install libsdl2-ttf-dev
 
+To run the emulator:
+1) go to folder cmake
+2) open terminal
+3) write "make all" -> this creates executable GB-Emulator
+4) to start emulator with ROM write "./GB-Emulator ../../roms/Tetris.gb"
+
 Warning: This emulator isn't fully implemented yet. You won't be able to play the attached ROM file.  
