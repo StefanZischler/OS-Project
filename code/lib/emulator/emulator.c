@@ -29,7 +29,8 @@ int emulator_run(int argc, char ** argv) {
   printf("Cart loaded correctly!\n");
 
   //intialize game window
-  render_game_windnow();
+  //commented out because it was not working
+  //render_game_windnow();
   //initialize CPU
   cpu_init();
   ctx.running = true;
@@ -49,7 +50,7 @@ int emulator_run(int argc, char ** argv) {
   }
 
   //update window
-  u32 previous_display = 0;
+  /*u32 previous_display = 0;
   while(!ctx.exit) {
     usleep(1000);
     handel_events();
@@ -57,7 +58,7 @@ int emulator_run(int argc, char ** argv) {
       update_window();
     }
     previous_display = ppu_get_context()->current_display;
-  }
+  }*/
   
   return 0;
 }
