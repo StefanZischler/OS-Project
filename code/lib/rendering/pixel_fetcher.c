@@ -84,6 +84,7 @@ void fifo_load_sprite_tile() {
   
 }
 
+//adds a 8-pixel row from fetched tiles to the fifo-queue
 bool fifo_add() {
   if(ctx.fifo.size > 8) {
     return false;
@@ -117,6 +118,7 @@ bool fifo_add() {
   return true;
 }
 
+//loads window tiles if necessary
 void fifo_load_window() {
   if (!window_visible_fetcher()) {
     return;
@@ -150,6 +152,7 @@ void fifo_load_window() {
     }
 }
 
+//gets the RGB color value represented by the color id
 u32 fifo_fetch_sprite_color(u8 background_color) {
   u32 color = lcd_get_context()->background_colors[background_color];
   u8 previous_sprite_x = 167;
@@ -198,6 +201,7 @@ u32 fifo_fetch_sprite_color(u8 background_color) {
   return color;
 }
 
+//fetches the color ids (hi or lo) from sprites on the current scanline
 //offset should be 0 for lo bits or 1 for hi bits
 void fifo_load_sprites(u8 offset) {
   //sprites can be either 8 or 16 pixels high
@@ -226,6 +230,9 @@ void fifo_load_sprites(u8 offset) {
   }
 }
 
+//behavior of the fetcher
+//it cycles through its states at half the speed of the fifo queue
+//and fetches a 8-pixel line for the fifo
 void fifo_fetch() {
   switch(ctx.fetcher.state) {
     case FETCH_TILE:
@@ -290,6 +297,7 @@ void fifo_fetch() {
   }
 }
 
+//pushes pixel onto the screen buffer
 void fifo_push_pixel() {
   if(ctx.fifo.size <= 8) {
     //fifo may not go below 8 entries in queue
@@ -304,6 +312,7 @@ void fifo_push_pixel() {
   ctx.line_x++;
 }
 
+//main method for fifo
 void fifo_process() {
   ctx.fetcher.tile_y_position = ((lcd_get_context()->line_y + lcd_get_context()->scroll_y) % 8) *2;
   ctx.tilemap_x = (ctx.fetcher.fetcher_x_position + lcd_get_context()->scroll_x);
@@ -316,6 +325,7 @@ void fifo_process() {
   fifo_push_pixel();
 }
 
+//resets the fifo queue
 void fifo_reset() {
   while(ctx.fifo.size > 0) {
     fifo_pop();
