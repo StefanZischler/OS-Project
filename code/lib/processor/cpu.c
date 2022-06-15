@@ -476,6 +476,10 @@ bool cpu_step () {
   }
   if (ctx.interrupt_master_enabled_flag) {
     cpu_handle_interrupts(&ctx);
+    ctx.enable_interrupt_master = false;
+  }
+  if (ctx.enable_interrupt_master) {
+    ctx.interrupt_master_enabled_flag = true;
   }
 
   return true;
@@ -940,7 +944,7 @@ static void type_di(cpu_context *ctx) {
 //enable interrupt master flag
 static void type_ei(cpu_context *ctx) {
   //printf("EI Instruction\n");
-  ctx->interrupt_master_enabled_flag = true;
+  ctx->enable_interrupt_master = true;
 }
 
 //load or store data to/from register A to a address in range 0xFF00-0xFFFF

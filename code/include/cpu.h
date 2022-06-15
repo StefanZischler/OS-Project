@@ -34,6 +34,7 @@ typedef struct {
 
   //interrupt master flag
   bool interrupt_master_enabled_flag;  
+  bool enable_interrupt_master;
 
   //interrupt enable register (IE)
   u8 ie_register;

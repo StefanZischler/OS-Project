@@ -48,8 +48,8 @@ u32 fifo_pop() {
     ctx.fifo.size--;
     u32 result = entry->value;
     free(entry);
-    printf("pop %u\n", result);
-    printf("size: %u\n", ctx.fifo.size);
+    //printf("pop %u\n", result);
+    //printf("size: %u\n", ctx.fifo.size);
     return result;
   }
 }
@@ -112,7 +112,7 @@ bool fifo_add() {
     //check if pixel is on screen
     //screen starts usually at x==8 but can be scrolled
     if((ctx.fetcher.fetcher_x_position * 8) - (8 - (lcd_get_context()->scroll_x % 8))) {
-      printf(" fifo_push %u\n", color);
+      //printf(" fifo_push %u\n", color);
       fifo_push(color);
       ctx.fifo_position++;
     }
@@ -297,17 +297,17 @@ void fifo_fetch() {
 void fifo_push_pixel() {
   if(ctx.fifo.size <= 8) {
     //fifo may not go below 8 entries in queue
-    printf("size: %d\n", ctx.fifo.size);
+    //printf("size: %d\n", ctx.fifo.size);
     return;
   }
   
-  printf("push pixel\n");
+  //printf("push pixel\n");
   if(ctx.line_x >= lcd_get_context()->scroll_x % 8) {
-    printf("Test %d\n", ctx.pushed_x_position + lcd_get_context()->line_y * 160);
+    //printf("Test %d\n", ctx.pushed_x_position + lcd_get_context()->line_y * 160);
     ppu_get_context()->display_buffer[ctx.pushed_x_position + lcd_get_context()->line_y * 160] = fifo_pop();
-    printf("Test 2\n");
+    //printf("Test 2\n");
     ctx.pushed_x_position++;
-    printf("TEST: pushed pixel %d\n", ctx.pushed_x_position + lcd_get_context()->line_y * 160);
+    //printf("TEST: pushed pixel %d\n", ctx.pushed_x_position + lcd_get_context()->line_y * 160);
   }
   
   ctx.line_x++;
